@@ -1,0 +1,268 @@
+TypeSafe AI
+
+Manifesto
+
+Our Team
+
+Docs
+
+Sign In
+
+Contact Sales
+
+Sept 15, 2026 • TypeSafe News
+
+🎉 TypeSafe announces System One models and Jev
+
+Read more
+
+Sept 20, 2026 • TypeSafe News
+
+NO MORE WAITLIST
+
+TypeSafe is now open to everyone
+
+Create your account
+
+Vm0weE1HRnRVWGRPVldScFRUSm9iMVJVU2pSVlZsbDNWMnQwYWxKc2NIaFZiVEZIVkd4YWRWRnJaRmRTYkVwRVZsWmFWMVpWTVVWaGVqQTk=
+
+ Introducing Jev ........................ Intelligence beyond chat
+
+The First (Public) System One Model; Jev Gives AI The Properties Of Code 
+Join Discord
+Sign Up
+
+∵ ⩆
+
+⩆ ∵
+
+Clock Tool 1.1
+
+Wednesday, Sep 23, 2026
+
+17:38:18
+
+Glider 1.1
+
+Game of Life
+
+LM
+
+LM
+
+berts
+
+<low intelligence>
+
+gpt
+
+LLM
+
+LLM
+
+pre-trained models
+
+gpt
+
+llama
+
+RLHF
+
+RLHF
+
+chat models
+
+chat gpt
+
+claude
+
+instruct gpt
+
+grok
+
+deep seek
+
+RLCD
+
+TypeSafeAi
+
+RLCD
+
+reinforcement learning
+
+for calibrated decisions
+
+RLVR
+
+RLVR
+
+reasoning models
+
+01
+
+03
+
+TypeSafe AI
+
+Version 0.01
+©2026. All rights reserved.
+
+Made in SF. With Love.
+
+TS.AI.0S1
+
+We Took The Opposite Research Direction
+
+Not Chat
+
+Reinforcement Learning from Human Feedback (RLHF) has led to LLMs that are optimized for human preferences. This has led to models that are superhuman at instruction following, and are what we now call “chat.” Yet RLHF creates inherent issues such as mode dropping, overconfidence, and lack of reliability. These flaws mean that LLMs require humans-in-the-loop.
+
+A New Model
+
+We built a new class of models, System One Models, to be natively used by machines. We’re building with a new architecture, a new sampler, and a new training algorithm: Reinforcement Learning for Calibrated Decisions (RLCD).
+
+Decisions, Not Strings
+
+Typed outputs that software can act on.
+
+Calibrated Confidence
+
+Every decision includes an estimate of how confident the model is.
+
+More Like Code
+
+Reliable, fast, and type-safe.
+
+[B.64]
+
+ZmxvYXQgUV9yc3FydCggZmxvYXQgbnVtYmVyICkKewoJbG9uZyBpOwoJZmxvYXQgeDIsIHk7Cgljb25zdCBmbG9hdCB0aHJlZWhhbGZzID0gMS41RjsKCXgyID0gbnVtYmVyICogMC41RjsKCXkgID0gbnVtYmVyOwoJaSAgPSAqICggbG9uZyAqICkgJnk7CglpICA9IDB4NWYzNzU5ZGYgLSAoIGkgPj4gMSApOwoJeSAgPSAqICggZmxvYXQgKiApICZpOwoJeSAgPSB5ICogKCB0aHJlZWhhbGZzIC0gKCB4MiAqIHkgKiB5ICkgKTsKLy8JeSAgPSB5ICogKCB0aHJlZWhhbGZzIC0gKCB4MiAqIHkgKiB5ICkgKTsKCXJldHVybiB5Owp9
+
+193.6x Faster,
+444.6x Cheaper.
+
+*Based On Workflows For System One Tasks (Proof)
+
+TypeSafe AI
+
+Cost $0.000081
+
+Completed in 0.114s
+
+LLMs
+
+Cost $0.013880
+
+Completed in 8.566s
+
+Watch the real video
+
+Built For Automation
+
+Jev returns typed decisions with calibrated probabilities, so your software can account for uncertainty. Set the thresholds for when it acts autonomously and when it asks for review. Combine those decisions in code to build larger workflows, with control over how the intelligence is used.
+
+Jev’s Intelligence Per Dollar Is Literally Off The Charts.
+
+Workflow Intelligence vs. Cost
+
+Machine-Native Intelligence
+
+LLMs produce words for people. Jev produces typed decisions and is more like code: reliable, fast, self-consistent, and type-safe.
+
+Hallucinations
+
+Zero Hallucinations
+
+Every Jev decision comes with a confidence estimate, so your software can act when confidence is high and escalate when it is not.
+
+Jev.Cost
+
+$42
+
+Per Billion input tokens.
+
+238x
+
+Lower input price than Claude Fable 5.1
+
+Come Build With Us
+Open Roles
+
+∵ ⩆
+
+⩆ ∵
+
+TypeSafeAI Blog
+
+Company News
+
+Introducing System One Models & Jev
+
+Read More
+
+The Bitterest Lesson
+
+Read More
+
+TL;DR: Compute drives progress in AI, but what good is progress if you are not doing the right task!
+
+AI: Too Good To Be True, Too Bad To Be Useful | TypeSafe AI
+
+Read More
+
+RLHF-trained language models please humans and assist rather than make reliable autonomous decisions. What comes next?
+
+∵ ⩆
+
+⩆ ∵
+
+∵ ⩆
+
+⩆ ∵
+
+We Give A FAQ
+
+What Are System One Models? What Is Jev?
+
+System One Models are a new class of AI model built for decisions inside software. Jev is TypeSafe’s first public System One Model, optimized for automation. Send Jev structured questions and get typed decisions with probabilities and confidence that your software can act on.
+
+Is Jev Just A Smaller LLM?
+
+How Is This Different From JSON Mode Or Structured Outputs?
+
+How Can Jev Be So Fast And Inexpensive?
+
+Can You Make Jev Even Faster?
+
+Are These Prices Temporary Or Subsidized?
+
+What Is Jev Good At? Where Does It Struggle?
+
+Can Jev Still Get Things Wrong?
+
+Is Jev Deterministic?
+
+How Do I Get Started Or Ask A Question?
+
+[B.64]
+
+IVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAl0lEQVR42mNgGPyg5u9/E1xyCV9+/7XDJVn/G7eky5vfl+U5sMvZPPn9Ow6XobP//T2LS07k7+/XTjjkFM7+/V2HS2PG7787+HHIBXz4fVAcl6F///6dj8vQ6b9//1bHIWdw9/FvNbg0vvr9+WgPLsm/V39H4pKb///VX3lcNj75+70HR4AzOPz+Ewdn/OOVlDiIR5K6AACSCULwD4UI6QAAAABJRU5ErkJggg==
+
+∵ ⩆
+
+⩆ ∵
+
+VHlwZVNhZmUgQUkgSW50ZWxsaWdlbmNlIE5vdw==
+
+TypeSafe AI © 2026
+
+Terms of Use
+
+Privacy Policy
+
+LinkedIn
+
+X
+
+hello@typesafe.ai
+
+                
