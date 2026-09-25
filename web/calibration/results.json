@@ -1,0 +1,145 @@
+{
+  "runAt": "2026-09-25T05:52:46.398Z",
+  "model": "jev-1.13.0",
+  "n": 24,
+  "kinds": {
+    "triage_relevance": {
+      "n": 10,
+      "accuracy": 0.9,
+      "brier": 0.118,
+      "ece": 0.192,
+      "threshold": 0.65,
+      "coverage": 0.9,
+      "targetAccuracy": 1,
+      "bins": [
+        {
+          "lo": 0,
+          "hi": 0.2,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.2,
+          "hi": 0.4,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.6,
+          "count": 1,
+          "accuracy": 0,
+          "confidence": 0.55
+        },
+        {
+          "lo": 0.6,
+          "hi": 0.8,
+          "count": 3,
+          "accuracy": 1,
+          "confidence": 0.7233333333333333
+        },
+        {
+          "lo": 0.8,
+          "hi": 1,
+          "count": 6,
+          "accuracy": 1,
+          "confidence": 0.9099999999999998
+        }
+      ]
+    },
+    "triage_site": {
+      "n": 8,
+      "accuracy": 1,
+      "brier": 0.056,
+      "ece": 0.161,
+      "threshold": 0.62,
+      "coverage": 1,
+      "targetAccuracy": 1,
+      "bins": [
+        {
+          "lo": 0,
+          "hi": 0.2,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.2,
+          "hi": 0.4,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.6,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.6,
+          "hi": 0.8,
+          "count": 1,
+          "accuracy": 1,
+          "confidence": 0.62
+        },
+        {
+          "lo": 0.8,
+          "hi": 1,
+          "count": 7,
+          "accuracy": 1,
+          "confidence": 0.87
+        }
+      ]
+    },
+    "grade_src": {
+      "n": 6,
+      "accuracy": 1,
+      "brier": 0.084,
+      "ece": 0.195,
+      "threshold": 0.6,
+      "coverage": 1,
+      "targetAccuracy": 1,
+      "bins": [
+        {
+          "lo": 0,
+          "hi": 0.2,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.2,
+          "hi": 0.4,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.6,
+          "count": 0,
+          "accuracy": 0,
+          "confidence": 0
+        },
+        {
+          "lo": 0.6,
+          "hi": 0.8,
+          "count": 2,
+          "accuracy": 1,
+          "confidence": 0.6599999999999999
+        },
+        {
+          "lo": 0.8,
+          "hi": 1,
+          "count": 4,
+          "accuracy": 1,
+          "confidence": 0.8775000000000001
+        }
+      ]
+    }
+  }
+}
