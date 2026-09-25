@@ -1,7 +1,7 @@
 export const layerId = (publicId: string) => publicId.replaceAll("/", ":");
 const text = (s: string) => encodeURIComponent(s).replaceAll("%2C", "%252C").replaceAll("%2F", "%252F");
 
-export function urls(cloudName: string) {
+export function urls(cloudName: string = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "demo") {
   const base = `https://res.cloudinary.com/${cloudName}/image/upload`;
   const composite = (beforeId: string, afterId: string, w: number) =>
     [
