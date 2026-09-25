@@ -13,6 +13,8 @@ export interface SearchRequest extends SearchFilters {
   query?: string;
   status?: string;
   source?: string;
+  grade?: number;
+  flagged?: boolean;
 }
 
 export function buildExpression(f: SearchFilters, folder = process.env.CLOUDINARY_FOLDER ?? "saakshya") {
@@ -30,7 +32,22 @@ export async function search(deps: PipelineDeps, req: SearchRequest) {
   let rows = (await repo.evidenceByIds(db, ids)).filter((r) => r.projectId === req.projectId);
   if (req.status) rows = rows.filter((r) => r.status === req.status);
   if (req.source) rows = rows.filter((r) => r.source === req.source);
+  if (req.flagged !== undefined) {
+    rows = rows.filter((r) => (req.flagged ? (r.flags?.length ?? 0) > 0 : (r.flags?.length ?? 0) === 0));
+  }
+  if (req.grade !== undefined) {
+    const siteIds = [...new Set(rows.map((r) => r.siteId).filter(Boolean))] as string[];
+    const gradeAssessments = await Promise.all(siteIds.map((sid) => repo.assessmentsForSite(db, sid)));
+    const matchingTimepoints = new Set<string>();
+    for (const list of gradeAssessments) {
+      for (const a of list) {
+        if (a.grade === req.grade) matchingTimepoints.add(`${a.siteId}@${a.timepoint}`);
+      }
+    }
+    rows = rows.filter((r) => r.siteId && r.timepoint && matchingTimepoints.has(`${r.siteId}@${r.timepoint}`));
+  }
   rows.sort((a, b) => (b.timepoint ?? "").localeCompare(a.timepoint ?? ""));
+
   const plain = rows.map((r) => ({ assetId: r.assetId, row: r, score: null as number | null }));
   if (!req.query?.trim()) return { reranked: false, items: plain };
 

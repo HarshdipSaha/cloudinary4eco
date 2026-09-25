@@ -15,6 +15,10 @@ export async function GET(req: Request) {
     const query = searchParams.get("query") ?? undefined;
     const status = searchParams.get("status") ?? undefined;
     const source = searchParams.get("source") ?? undefined;
+    const gradeStr = searchParams.get("grade");
+    const grade = gradeStr !== null && gradeStr !== "" ? parseInt(gradeStr, 10) : undefined;
+    const flaggedStr = searchParams.get("flagged");
+    const flagged = flaggedStr !== null && flaggedStr !== "" ? flaggedStr === "true" : undefined;
 
     const d = deps();
     const result = await search(d, {
@@ -25,7 +29,10 @@ export async function GET(req: Request) {
       query,
       status,
       source,
+      grade,
+      flagged,
     });
+
 
     const urlBuilder = urls();
     const items = result.items.map((item) => ({

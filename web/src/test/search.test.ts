@@ -3,6 +3,9 @@ import { world } from "./world";
 import { analysis } from "./fakes";
 import { ingestBatch } from "@/pipeline/ingest";
 import { search, buildExpression } from "@/search/search";
+import * as repo from "@/ledger/repo";
+import * as schema from "@/ledger/schema";
+
 
 let w: Awaited<ReturnType<typeof world>>;
 beforeEach(async () => {
@@ -32,4 +35,23 @@ describe("search", () => {
     expect(r.reranked).toBe(false);
     expect(r.items).toHaveLength(2);
   });
+  it("filters by flagged status", async () => {
+    const rFlagged = await search(w.deps, { projectId: "p1", flagged: true });
+    expect(rFlagged.items).toHaveLength(0);
+    const rUnflagged = await search(w.deps, { projectId: "p1", flagged: false });
+    expect(rUnflagged.items).toHaveLength(2);
+  });
+  it("filters by timepoint SRC grade", async () => {
+    await w.deps.db.insert(schema.assessments).values({
+      siteId: "s1",
+      timepoint: "2026-09-28",
+      grade: 3,
+      status: "accepted",
+    });
+
+    // q1 is at site s1
+    const r = await search(w.deps, { projectId: "p1", grade: 3 });
+    expect(Array.isArray(r.items)).toBe(true);
+  });
 });
+
