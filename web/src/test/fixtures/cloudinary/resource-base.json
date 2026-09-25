@@ -1,0 +1,20 @@
+{
+  "public_id": "saakshya/probe/test_photo",
+  "secure_url": "https://res.cloudinary.com/vgqybufp/image/upload/v1234567890/saakshya/probe/test_photo.jpg",
+  "width": 1920,
+  "height": 1080,
+  "format": "jpg",
+  "resource_type": "image",
+  "created_at": "2026-09-25T10:00:00Z",
+  "tags": ["tree", "soil"],
+  "phash": "0f0f0f0f0f0f0f0f",
+  "faces": [[100, 100, 50, 50]],
+  "image_metadata": {
+    "GPSLatitude": "28 deg 36' 50.40\" N",
+    "GPSLatitudeRef": "North",
+    "GPSLongitude": "77 deg 12' 34.00\" E",
+    "GPSLongitudeRef": "East",
+    "DateTimeOriginal": "2026:09:25 10:00:00",
+    "OffsetTimeOriginal": "+05:30"
+  }
+}
