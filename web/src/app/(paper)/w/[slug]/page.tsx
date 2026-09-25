@@ -9,7 +9,7 @@ export default async function WitnessCapturePage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await props.params;
-  const db = getDb();
+  const db = await getDb();
   const site = await repo.siteBySlug(db, slug);
   if (!site) notFound();
 

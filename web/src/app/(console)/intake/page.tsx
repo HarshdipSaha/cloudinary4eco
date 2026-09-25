@@ -7,7 +7,7 @@ import type { Flag } from "@/domain/types";
 export const dynamic = "force-dynamic";
 
 export default async function IntakePage() {
-  const db = getDb();
+  const db = await getDb();
   const projects = await repo.listProjects(db);
   const projectId = projects[0]?.id ?? "yamuna-green";
   const sites = await repo.sitesForProject(db, projectId);

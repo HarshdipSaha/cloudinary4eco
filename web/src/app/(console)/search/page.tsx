@@ -5,7 +5,7 @@ import { SearchClient } from "@/ui/search/SearchClient";
 export const dynamic = "force-dynamic";
 
 export default async function SearchPage() {
-  const db = getDb();
+  const db = await getDb();
   const projects = await repo.listProjects(db);
   const projectId = projects[0]?.id ?? "yamuna-green";
   const sites = await repo.sitesForProject(db, projectId);

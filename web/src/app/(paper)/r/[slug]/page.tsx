@@ -9,7 +9,7 @@ export default async function PublicReportViewPage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await props.params;
-  const db = getDb();
+  const db = await getDb();
   const r = await repo.reportBySlug(db, slug);
   if (!r) notFound();
 

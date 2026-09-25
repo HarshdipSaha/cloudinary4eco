@@ -9,7 +9,7 @@ export default async function ConsoleReportViewPage(props: {
   params: Promise<{ reportId: string }>;
 }) {
   const { reportId } = await props.params;
-  const db = getDb();
+  const db = await getDb();
   const r = await repo.report(db, reportId);
   if (!r) notFound();
 

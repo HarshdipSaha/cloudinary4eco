@@ -9,7 +9,7 @@ import { ArrowRight, CheckCircle2, AlertTriangle, HelpCircle } from "lucide-reac
 export const dynamic = "force-dynamic";
 
 export default async function ConsoleHomePage() {
-  const db = getDb();
+  const db = await getDb();
   const projects = await repo.listProjects(db);
   const projectId = projects[0]?.id ?? "yamuna-green";
   const project = await repo.project(db, projectId);

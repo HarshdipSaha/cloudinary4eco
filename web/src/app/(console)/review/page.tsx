@@ -6,7 +6,7 @@ import type { ProjectType } from "@/domain/types";
 export const dynamic = "force-dynamic";
 
 export default async function ReviewPage() {
-  const db = getDb();
+  const db = await getDb();
   const projects = await repo.listProjects(db);
   const projectId = projects[0]?.id ?? "yamuna-green";
   const project = await repo.project(db, projectId);
