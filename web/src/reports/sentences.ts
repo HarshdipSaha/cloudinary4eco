@@ -5,7 +5,9 @@ export interface DraftSentence {
 }
 
 const HEADING = /^\s*#*\s*\**\s*(findings|impression)\s*\**\s*:?\s*$/i;
-const CITE = /\[(F\d+)\]/g;
+// Some drafting models substitute full-width CJK-style brackets for the requested ASCII ones;
+// accept both so a model's bracket-glyph choice never silently zeroes out every citation.
+const CITE = /[\[【](F\d+)[\]】]/g;
 
 export function splitDraft(draft: string): DraftSentence[] {
   const out: DraftSentence[] = [];
@@ -18,7 +20,7 @@ export function splitDraft(draft: string): DraftSentence[] {
       section = h[1]!.toLowerCase() as DraftSentence["section"];
       continue;
     }
-    const chunks = line.match(/.+?[.!?](?:\s*\[F\d+\])*(?=\s|$)|.+$/g) ?? [];
+    const chunks = line.match(/.+?[.!?](?:\s*[\[【]F\d+[\]】])*(?=\s|$)|.+$/g) ?? [];
     for (const chunk of chunks) {
       const factIds = [...chunk.matchAll(CITE)].map((m) => m[1]!);
       const text = chunk

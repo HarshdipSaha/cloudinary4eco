@@ -166,10 +166,14 @@ export async function agreementsForSite(db: Db, siteId: string) {
 
 export async function siteChart(db: Db, siteId: string) {
   const s = await site(db, siteId);
-  if (!s) return { site: null, baseline: null, timepoints: [], counts: {} as Record<string, number>, agreement: null, project: null };
+  if (!s) return { site: null, baseline: null, timepoints: [], candidates: [], counts: {} as Record<string, number>, agreement: null, project: null };
   const proj = await project(db, s.projectId);
   const baseline = s.baselineAssetId ? await evidenceItem(db, s.baselineAssetId) : null;
   const items = await evidenceForSite(db, siteId);
+  // Baseline candidates come from all evidence assigned to this site, not from graded
+  // timepoints: grading requires a baseline to already exist (assessSite refuses without one),
+  // so before a baseline is set, timepoints is always empty and would starve this list forever.
+  const candidates = items.filter((e) => e.status !== "set_aside");
   const byDay = new Map<string, Awaited<ReturnType<typeof assessmentsForSite>>[number]>();
   for (const a of await assessmentsForSite(db, siteId)) byDay.set(a.timepoint, a); // oldest→newest, so the last per day wins
   const timepoints = [];
@@ -180,7 +184,7 @@ export async function siteChart(db: Db, siteId: string) {
     timepoints.push({ timepoint, grade: a.grade, status: a.status, derivative: der, decision: dec, source, photos: items.filter((e) => e.timepoint === timepoint) });
   }
   const counts = items.reduce<Record<string, number>>((m, e) => ({ ...m, [e.status]: (m[e.status] ?? 0) + 1 }), { accepted: 0, needs_review: 0, set_aside: 0, pending: 0 });
-  return { site: s, project: proj, baseline, timepoints, counts, agreement: await latestAgreement(db, siteId) };
+  return { site: s, project: proj, baseline, timepoints, candidates, counts, agreement: await latestAgreement(db, siteId) };
 }
 
 export type ReviewQueueItem =

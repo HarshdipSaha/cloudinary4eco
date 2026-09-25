@@ -27,7 +27,7 @@ export function buildExpression(f: SearchFilters, folder = process.env.CLOUDINAR
 
 export async function search(deps: PipelineDeps, req: SearchRequest) {
   const { db, media, decisions } = deps;
-  let rows: (typeof repo.t.evidence.$inferSelect)[] = [];
+  let rows: Awaited<ReturnType<typeof repo.evidenceForProject>> = [];
   try {
     const ids = await media.searchIds(buildExpression(req), 100);
     if (ids.length) {
