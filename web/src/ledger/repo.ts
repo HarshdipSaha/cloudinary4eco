@@ -87,6 +87,15 @@ export async function evidenceForBatch(db: Db, batchId: string) {
 export async function evidenceForSite(db: Db, siteId: string) {
   return db.select().from(t.evidence).where(eq(t.evidence.siteId, siteId)).orderBy(t.evidence.capturedAt);
 }
+export async function evidenceForProject(db: Db, projectId: string, limit = 200) {
+  return db
+    .select()
+    .from(t.evidence)
+    .where(eq(t.evidence.projectId, projectId))
+    .orderBy(desc(t.evidence.createdAt))
+    .limit(limit);
+}
+
 export async function priorHashes(db: Db, projectId: string) {
   return (await db.select({ assetId: t.evidence.assetId, siteId: t.evidence.siteId, phash: t.evidence.phash, capturedAt: t.evidence.capturedAt, batchId: t.evidence.batchId })
     .from(t.evidence).where(and(eq(t.evidence.projectId, projectId), isNotNull(t.evidence.phash))))
