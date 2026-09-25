@@ -5,11 +5,11 @@ import { cvRegistration } from "./cv/client";
 import { groqDrafter } from "./llm/groq";
 import { getDb } from "@/ledger/db";
 
-let cached: ReturnType<typeof build> | null = null;
-function build() {
-  return { db: getDb(), media: cloudinaryGateway(), decisions: jevDecisions(), registration: cvRegistration(), drafter: groqDrafter() };
+let cached: Awaited<ReturnType<typeof build>> | null = null;
+async function build() {
+  return { db: await getDb(), media: cloudinaryGateway(), decisions: jevDecisions(), registration: cvRegistration(), drafter: groqDrafter() };
 }
-export function deps() {
-  cached ??= build();
+export async function deps() {
+  cached ??= await build();
   return cached;
 }

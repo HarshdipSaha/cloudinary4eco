@@ -2,12 +2,12 @@ import type { DrafterPort } from "@/ports/drafter";
 
 const SYSTEM = `You draft donor reports for a field programme. Rules:
 - Use ONLY the numbered facts provided. Do not add numbers, places, names or outcomes that are not in the facts.
-- Every sentence must end with one or more citations of the facts it relies on, like [F2] or [F1][F4].
+- Every sentence must end with one or more citations of the facts it relies on, like [F2] or [F1][F4]. Use plain ASCII square brackets exactly as shown — never full-width or other bracket styles.
 - Write two sections with these exact headings on their own lines: "Findings" then "Impression".
 - Findings: 4-8 sentences, plain and specific. Impression: 2-3 sentences summarising.
 - Where evidence is weak, contested or pending, say so plainly.`;
 
-export function groqDrafter(rawApiKey = process.env.GROQ_API_KEY!, model = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile"): DrafterPort {
+export function groqDrafter(rawApiKey = process.env.GROQ_API_KEY!, model = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b"): DrafterPort {
   const apiKey = (rawApiKey ?? "").split(",")[0]?.trim() ?? "";
   return {
     async draft({ projectName, periodStart, periodEnd, facts }) {

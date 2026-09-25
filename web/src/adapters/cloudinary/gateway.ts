@@ -8,7 +8,6 @@ export const ANALYSIS_UPLOAD_PARAMS: Record<string, string> = {
   image_metadata: "true",
   phash: "true",
   faces: "true",
-  detection: "captioning",
 };
 
 export function cloudinaryGateway(): MediaPort {
