@@ -2,8 +2,9 @@ import { createHash } from "node:crypto";
 import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import type { Db } from "./db";
 import * as t from "./schema";
-import type { Decision, DecisionKind, ProjectType, Site } from "@/domain/types";
+import { INTEGRITY_FLAGS, type Decision, type DecisionKind, type ProjectType, type Site } from "@/domain/types";
 import { JEV_USD_PER_INPUT_TOKEN } from "@/domain/thresholds";
+
 
 const toSite = (r: typeof t.sites.$inferSelect): Site => ({
   id: r.id, projectId: r.projectId, name: r.name, description: r.description,
@@ -181,5 +182,57 @@ export async function siteChart(db: Db, siteId: string) {
   const counts = items.reduce<Record<string, number>>((m, e) => ({ ...m, [e.status]: (m[e.status] ?? 0) + 1 }), { accepted: 0, needs_review: 0, set_aside: 0, pending: 0 });
   return { site: s, project: proj, baseline, timepoints, counts, agreement: await latestAgreement(db, siteId) };
 }
+
+export type ReviewQueueItem =
+  | { kind: "evidence"; row: typeof t.evidence.$inferSelect; group: "integrity" | "low_confidence" }
+  | { kind: "grade"; assessment: typeof t.assessments.$inferSelect; site: typeof t.sites.$inferSelect };
+
+export async function reviewQueue(db: Db, projectId: string): Promise<ReviewQueueItem[]> {
+  const evList = await db
+    .select()
+    .from(t.evidence)
+    .where(and(eq(t.evidence.projectId, projectId), eq(t.evidence.status, "needs_review")))
+    .orderBy(desc(t.evidence.createdAt));
+
+  const integrityItems: ReviewQueueItem[] = [];
+  const lowConfidenceItems: ReviewQueueItem[] = [];
+
+  for (const row of evList) {
+    const isIntegrity = (row.flags ?? []).some((f) => INTEGRITY_FLAGS.includes(f.kind as any));
+    if (isIntegrity) {
+      integrityItems.push({ kind: "evidence", row, group: "integrity" });
+    } else {
+      lowConfidenceItems.push({ kind: "evidence", row, group: "low_confidence" });
+    }
+  }
+
+  const projectSites = await db.select().from(t.sites).where(eq(t.sites.projectId, projectId));
+  const siteMap = new Map(projectSites.map((s) => [s.id, s]));
+  const siteIds = projectSites.map((s) => s.id);
+
+  const gradeItems: ReviewQueueItem[] = [];
+  if (siteIds.length > 0) {
+    const allAssessments = await db
+      .select()
+      .from(t.assessments)
+      .where(and(inArray(t.assessments.siteId, siteIds), eq(t.assessments.status, "needs_review")))
+      .orderBy(desc(t.assessments.createdAt));
+
+    const seen = new Set<string>();
+    for (const a of allAssessments) {
+      const key = `${a.siteId}@${a.timepoint}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        const s = siteMap.get(a.siteId);
+        if (s) {
+          gradeItems.push({ kind: "grade", assessment: a, site: s });
+        }
+      }
+    }
+  }
+
+  return [...integrityItems, ...lowConfidenceItems, ...gradeItems];
+}
+
 
 
