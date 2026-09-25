@@ -19,3 +19,6 @@ __pycache__/
 # misc
 .DS_Store
 archive/scratch/
+.data/
+web/.data/
+
