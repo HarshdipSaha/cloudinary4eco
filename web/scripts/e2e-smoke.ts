@@ -32,7 +32,7 @@ async function upload(path: string) {
 
 async function main() {
   console.log("Uploading test photos...");
-  const [b, f, o] = [await upload(baselinePath), await upload(followPath), await upload(otherPath)];
+  const [b, f, o] = [await upload(baselinePath!), await upload(followPath!), await upload(otherPath!)];
   console.log("Uploaded assets:", { baseline: b, followup: f, other: o });
 
   console.log("Ingesting baseline...");

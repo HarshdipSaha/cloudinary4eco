@@ -1,1 +1,131 @@
 @import "tailwindcss";
+
+/* Reading room (console) is the default theme. */
+:root {
+  --surface-0: #0B0E11;
+  --surface-1: #12161A;
+  --surface-2: #1A1F24;
+  --line: #262D34;
+  --text: #E4E7EA;
+  --text-2: #A3ACB5;
+  --text-3: #7C8691;
+  --measure: #5FB3A1;
+  --measure-ink: #0B0E11;
+  --attention: #D9A441;
+  --flag: #E5484D;
+  --grade-0: #3B4148;
+  --grade-1: #5C6670;
+  --grade-2: #7FA99F;
+  --grade-3: #A9E0D2;
+  --plate-mat: #05070A;
+  color-scheme: dark;
+}
+
+/* Paper: report, public pages, witness capture. */
+[data-theme="paper"] {
+  --surface-0: #F6F6F3;
+  --surface-1: #FFFFFF;
+  --surface-2: #EEEFEB;
+  --line: #D9DCD8;
+  --text: #16191C;
+  --text-2: #4E5760;
+  --text-3: #5F6870;
+  --measure: #1F7A6B;
+  --measure-ink: #FFFFFF;
+  --attention: #8A5E00;
+  --flag: #C2262D;
+  --grade-0: #C9CDD1;
+  --grade-1: #9AA3AB;
+  --grade-2: #4F9588;
+  --grade-3: #1F7A6B;
+  --plate-mat: #E6E7E3;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-measure: var(--measure);
+  --color-measure-ink: var(--measure-ink);
+  --color-attention: var(--attention);
+  --color-flag: var(--flag);
+  --color-plate-mat: var(--plate-mat);
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-serif: var(--font-source-serif), Georgia, serif;
+  --ease-station: cubic-bezier(0.2, 0, 0, 1);
+}
+
+html {
+  font-size: 14px;
+}
+[data-theme="paper"] {
+  font-size: 16px;
+}
+body {
+  background: var(--surface-0);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.mono,
+code,
+kbd {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--measure);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+::selection {
+  background: var(--measure);
+  color: var(--measure-ink);
+}
+
+/* One entrance for rows and panels; nothing bounces. */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.settle {
+  animation: settle 120ms var(--ease-station) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settle {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  :root,
+  [data-theme] {
+    --surface-0: #fff;
+    --surface-1: #fff;
+    --text: #000;
+    --line: #bbb;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
