@@ -159,6 +159,28 @@ describe("ingestBatch", () => {
     const done = events.find((e) => e.type === "done");
     expect(done && done.type === "done" && done.usage.inputTokens).toBeGreaterThan(0);
   });
+
+  it("uses browser GPS and server receipt time for canvas captures", async () => {
+    w.media.add(analysis("cam1", { gps: null, capturedAt: null }));
+    await ingestBatch(w.deps, {
+      projectId: "p1",
+      source: "witness",
+      assetIds: ["cam1"],
+      batchId: "bw",
+      siteId: "s1",
+      meta: {
+        cam1: {
+          gps: { lat: 28.6001, lon: 77.2001 },
+          sentAt: "2026-09-30T09:00:00+05:30",
+          timeSource: "the time the photo reached the server",
+        },
+      },
+    });
+    const e = await repo.evidenceItem(w.db, "cam1");
+    expect(e).toMatchObject({ lat: 28.6001, timepoint: "2026-09-30" });
+    expect(e?.flags.find((f) => f.kind === "capture_time_from_chat")?.detail).toMatch(/reached the server/);
+  });
 });
+
 
 export { DecisionsUnavailable };

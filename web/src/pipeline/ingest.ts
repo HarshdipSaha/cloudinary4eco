@@ -1,6 +1,6 @@
 import type { Db } from "@/ledger/db";
 import * as repo from "@/ledger/repo";
-import type { EvidenceSource, EvidenceStatus, Flag, MediaAnalysis, ProjectType, RegistrationResult, Site } from "@/domain/types";
+import type { EvidenceSource, EvidenceStatus, Flag, LatLon, MediaAnalysis, ProjectType, RegistrationResult, Site } from "@/domain/types";
 import type { MediaPort } from "@/ports/media";
 import { DecisionsUnavailable, type DecisionsPort, type TriageInput, type TriageResult } from "@/ports/decisions";
 import { RegistrationUnavailable, type RegistrationPort } from "@/ports/registration";
@@ -24,7 +24,10 @@ export interface AssetMeta {
   sentAt?: string;
   sender?: string;
   comment?: string;
+  gps?: LatLon;
+  timeSource?: string;
 }
+
 
 export interface IngestRequest {
   projectId: string;
@@ -108,9 +111,11 @@ export async function ingestBatch(deps: PipelineDeps, req: IngestRequest, emit: 
     const n: Flag[] = [];
     if (!a.capturedAt && m?.sentAt) {
       a = { ...a, capturedAt: m.sentAt };
-      n.push({ kind: "capture_time_from_chat", detail: "Capture time taken from the WhatsApp message time.", relatedAssetIds: [] });
+      n.push({ kind: "capture_time_from_chat", detail: `Capture time taken from ${m.timeSource ?? "the WhatsApp message time"}.`, relatedAssetIds: [] });
     }
+    if (!a.gps && m?.gps) a = { ...a, gps: m.gps };
     if (!a.capturedAt) n.push({ kind: "date_unknown", detail: "No capture time in the photo or chat.", relatedAssetIds: [] });
+
     notes.set(id, n);
     await repo.upsertEvidence(db, evidenceRow(req, a, m));
     emit({ type: "analyzed", assetId: id, thumbUrl: a.secureUrl });
