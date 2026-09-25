@@ -14,7 +14,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
-    const d = deps();
+    const d = await deps();
 
     const reportId = await composeReport(d, {
       projectId: body.projectId,

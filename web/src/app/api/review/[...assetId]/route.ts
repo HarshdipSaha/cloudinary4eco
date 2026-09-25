@@ -14,10 +14,10 @@ const Body = z.object({
   actor: z.string().default("reviewer"),
 });
 
-export async function GET(req: Request, props: { params: Promise<{ assetId: string }> }) {
+export async function GET(req: Request, props: { params: Promise<{ assetId: string[] }> }) {
   try {
-    const { assetId } = await props.params;
-    const d = deps();
+    const assetId = (await props.params).assetId.join("/");
+    const d = await deps();
     const e = await repo.evidenceItem(d.db, assetId);
     if (!e) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const decs = await repo.decisionsFor(d.db, assetId);
@@ -30,11 +30,11 @@ export async function GET(req: Request, props: { params: Promise<{ assetId: stri
   }
 }
 
-export async function POST(req: Request, props: { params: Promise<{ assetId: string }> }) {
+export async function POST(req: Request, props: { params: Promise<{ assetId: string[] }> }) {
   try {
-    const { assetId } = await props.params;
+    const assetId = (await props.params).assetId.join("/");
     const body = Body.parse(await req.json());
-    const d = deps();
+    const d = await deps();
 
     await applyReview(d, {
       assetId,

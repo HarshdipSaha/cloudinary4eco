@@ -22,7 +22,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
-    const { db } = deps();
+    const { db } = await deps();
     const slugBase = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const qrSlug = body.qrSlug || `${slugBase}-${rand4()}`;
 

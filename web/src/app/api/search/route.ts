@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     const flaggedStr = searchParams.get("flagged");
     const flagged = flaggedStr !== null && flaggedStr !== "" ? flaggedStr === "true" : undefined;
 
-    const d = deps();
+    const d = await deps();
     const result = await search(d, {
       projectId,
       siteId,

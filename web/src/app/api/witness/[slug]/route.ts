@@ -18,7 +18,7 @@ export async function POST(req: Request, props: { params: Promise<{ slug: string
   try {
     const { slug } = await props.params;
     const body = Body.parse(await req.json());
-    const d = deps();
+    const d = await deps();
     const site = await repo.siteBySlug(d.db, slug);
     if (!site) return NextResponse.json({ error: "Unknown site slug" }, { status: 404 });
 

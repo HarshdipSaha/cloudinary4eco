@@ -15,7 +15,7 @@ const hits = new Map<string, number[]>();
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
-    const { db, media } = deps();
+    const { db, media } = await deps();
     if ("siteSlug" in body) {
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
       const now = Date.now();

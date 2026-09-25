@@ -16,7 +16,7 @@ export async function POST(req: Request, props: { params: Promise<{ siteId: stri
   try {
     const { siteId } = await props.params;
     const body = Body.parse(await req.json());
-    const d = deps();
+    const d = await deps();
 
     await signReading(d, {
       siteId,

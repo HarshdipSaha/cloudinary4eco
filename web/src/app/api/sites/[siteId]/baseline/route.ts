@@ -13,7 +13,7 @@ export async function POST(req: Request, props: { params: Promise<{ siteId: stri
   try {
     const { siteId } = await props.params;
     const body = Body.parse(await req.json());
-    const { db } = deps();
+    const { db } = await deps();
 
     const site = await repo.site(db, siteId);
     if (!site) return NextResponse.json({ error: "Unknown site" }, { status: 404 });

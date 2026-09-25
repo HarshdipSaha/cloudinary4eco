@@ -15,7 +15,7 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
-    const { db } = deps();
+    const { db } = await deps();
     await repo.createProject(db, {
       id: body.id,
       name: body.name,
