@@ -27,7 +27,7 @@ export function NewReportForm({
     setStep("Collecting facts from ledger...");
 
     try {
-      setTimeout(() => setStep("Drafting narrative with Llama 3.3 70B..."), 1500);
+      setTimeout(() => setStep("Drafting narrative..."), 1500);
       setTimeout(() => setStep("Checking each sentence against its receipts with Jev..."), 3000);
 
       const res = await fetch("/api/reports", {

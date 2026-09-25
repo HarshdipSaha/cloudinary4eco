@@ -36,6 +36,7 @@ export function ReadingPanel({
   project,
   baseline,
   timepoints,
+  candidates,
   counts,
   agreement,
 }: {
@@ -43,6 +44,7 @@ export function ReadingPanel({
   project: any;
   baseline: EvidenceRow | null;
   timepoints: TimepointData[];
+  candidates: EvidenceRow[];
   counts: Record<string, number>;
   agreement: any | null;
 }) {
@@ -78,8 +80,13 @@ export function ReadingPanel({
         <p className="mt-2 text-text-2">
           This site does not have a designated baseline photo yet. Select a photo below to set it as baseline:
         </p>
+        {candidates.length === 0 ? (
+          <p className="mt-6 text-text-3">
+            No photos assigned to this site yet. Go to Intake or Review to assign one.
+          </p>
+        ) : (
         <div className="mt-6 grid grid-cols-4 gap-4">
-          {activeTP?.photos.map((p) => (
+          {candidates.map((p) => (
             <div key={p.assetId} className="flex flex-col gap-2 border border-line bg-surface-1 p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cld.thumb(p.assetId, 300)} alt={p.caption ?? ""} className="h-44 w-full object-cover" />
@@ -99,6 +106,7 @@ export function ReadingPanel({
             </div>
           ))}
         </div>
+        )}
       </div>
     );
   }

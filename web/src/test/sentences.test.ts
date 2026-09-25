@@ -19,4 +19,11 @@ Progress is real but early. [F1]`;
   it("tolerates markdown headings and bold", () => {
     expect(splitDraft("## **Findings**\nOne. [F1]")[0]).toMatchObject({ section: "findings", text: "One.", factIds: ["F1"] });
   });
+  it("accepts full-width brackets some models substitute for ASCII ones", () => {
+    expect(splitDraft("Findings\nPlot B was graded well.【F1】")[0]).toMatchObject({
+      section: "findings",
+      text: "Plot B was graded well.",
+      factIds: ["F1"],
+    });
+  });
 });

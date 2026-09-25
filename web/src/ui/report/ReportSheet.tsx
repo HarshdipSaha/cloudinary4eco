@@ -150,7 +150,7 @@ export function ReportSheet({
           </div>
 
           <div className="mt-2 text-[11px] text-paper-ink-muted font-mono">
-            Models: Drafter (Llama 3.3 70B) · Fact Verifier (TypeSafe Jev calibrated)
+            Models: Drafter (Groq, prose only) · Fact Verifier (TypeSafe Jev calibrated)
           </div>
         </header>
 

@@ -1,0 +1,8 @@
+{
+  "base": "ok",
+  "captioning": "FAILED: You don't have an active subscription for Cloudinary AI Content Analysis",
+  "google_tagging": "FAILED: You don't have an active subscription for Google Auto Tagging",
+  "aws_rek_tagging": "FAILED: You don't have an active subscription for Rekognition Auto Tagging",
+  "cld_tagging": "FAILED: You don't have an active subscription for Cloudinary AI Content Analysis",
+  "adv_ocr": "FAILED: You don't have an active subscription for OCR Text Detection and Extraction"
+}

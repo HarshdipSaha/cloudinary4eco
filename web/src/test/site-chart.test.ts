@@ -21,4 +21,34 @@ describe("siteChart", () => {
     expect(c.timepoints[0]!.decision?.probabilities).toBeDefined();
     expect(c.counts).toMatchObject({ accepted: 3, needs_review: 0 }); // baseline + sc1 + sc2
   });
+
+  it("returns baseline candidates for a site with no baseline yet, even with no graded timepoints", async () => {
+    const w = await world();
+    w.media.add(analysis("cand1"));
+    w.media.add(analysis("cand2", { capturedAt: null }));
+    await ingestBatch(w.deps, { projectId: "p1", source: "implementer", assetIds: ["cand1", "cand2"], batchId: "b2", siteId: "s2" });
+    await repo.upsertEvidence(w.db, {
+      assetId: "rejected1",
+      projectId: "p1",
+      siteId: "s2",
+      source: "implementer",
+      status: "set_aside",
+      secureUrl: "https://res.cloudinary.com/demo/image/upload/rejected1",
+      width: 1600,
+      height: 1200,
+      caption: null,
+      tags: [],
+      capturedAt: null,
+      timepoint: null,
+      lat: null,
+      lon: null,
+      phash: null,
+      missingSignals: [],
+      flags: [],
+    });
+
+    const c = await repo.siteChart(w.db, "s2");
+    expect(c.timepoints).toEqual([]);
+    expect(c.candidates.map((p) => p.assetId).sort()).toEqual(["cand1", "cand2"]);
+  });
 });
