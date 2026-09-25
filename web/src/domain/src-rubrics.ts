@@ -90,3 +90,6 @@ export const SRC: Record<ProjectType, Rubric> = {
 export function gradeLabel(type: ProjectType, grade: number): string {
   return SRC[type].labels[grade as 0 | 1 | 2 | 3] ?? "Unknown";
 }
+
+export const SRC_RUBRICS = SRC;
+

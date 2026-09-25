@@ -154,3 +154,23 @@ export async function agreementsForSite(db: Db, siteId: string) {
   return db.select().from(t.agreements).where(eq(t.agreements.siteId, siteId)).orderBy(desc(t.agreements.createdAt));
 }
 
+export async function siteChart(db: Db, siteId: string) {
+  const s = await site(db, siteId);
+  if (!s) return { site: null, baseline: null, timepoints: [], counts: {} as Record<string, number>, agreement: null, project: null };
+  const proj = await project(db, s.projectId);
+  const baseline = s.baselineAssetId ? await evidenceItem(db, s.baselineAssetId) : null;
+  const items = await evidenceForSite(db, siteId);
+  const byDay = new Map<string, Awaited<ReturnType<typeof assessmentsForSite>>[number]>();
+  for (const a of await assessmentsForSite(db, siteId)) byDay.set(a.timepoint, a); // oldest→newest, so the last per day wins
+  const timepoints = [];
+  for (const [timepoint, a] of [...byDay].sort(([x], [y]) => x.localeCompare(y))) {
+    const der = a.derivativeId ? await derivative(db, a.derivativeId) : null;
+    const dec = a.decisionId ? await decision(db, a.decisionId) : null;
+    const source = der ? items.find((e) => e.assetId === der.sourceAssetId) ?? null : null;
+    timepoints.push({ timepoint, grade: a.grade, status: a.status, derivative: der, decision: dec, source, photos: items.filter((e) => e.timepoint === timepoint) });
+  }
+  const counts = items.reduce<Record<string, number>>((m, e) => ({ ...m, [e.status]: (m[e.status] ?? 0) + 1 }), { accepted: 0, needs_review: 0, set_aside: 0, pending: 0 });
+  return { site: s, project: proj, baseline, timepoints, counts, agreement: await latestAgreement(db, siteId) };
+}
+
+
