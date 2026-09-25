@@ -7,12 +7,26 @@ DIFF_THRESHOLD = 25.0
 CALIPER_BGR = (161, 179, 95)  # #5FB3A1
 
 
+def adaptive_exg_threshold(exg: np.ndarray, mask: np.ndarray) -> float:
+    """Computes an adaptive ExG threshold using Otsu on positive ExG, with 0.10 floor (SATE / Agronomy prior art)."""
+    if not mask.any():
+        return EXG_THRESHOLD
+    vals = exg[mask]
+    if vals.max() <= EXG_THRESHOLD:
+        return EXG_THRESHOLD
+    exg_norm = np.clip((vals + 1.0) * 127.5, 0, 255).astype(np.uint8)
+    val, _ = cv2.threshold(exg_norm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    thresh = (val / 127.5) - 1.0
+    return float(max(thresh, EXG_THRESHOLD))
+
+
 def vegetation_fraction(img: np.ndarray, mask: np.ndarray) -> float:
     f = img.astype(np.float32)
     b, g, r = f[..., 0], f[..., 1], f[..., 2]
     s = r + g + b + 1e-6
     exg = 2 * g / s - r / s - b / s
-    veg = (exg > EXG_THRESHOLD) & mask
+    thresh = adaptive_exg_threshold(exg, mask)
+    veg = (exg > thresh) & mask
     return float(veg.sum() / max(int(mask.sum()), 1))
 
 
