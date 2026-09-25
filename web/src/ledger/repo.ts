@@ -234,5 +234,92 @@ export async function reviewQueue(db: Db, projectId: string): Promise<ReviewQueu
   return [...integrityItems, ...lowConfidenceItems, ...gradeItems];
 }
 
+export interface ReadingListRow {
+  site: Site;
+  latestGrade: number | null;
+  lastReadingDate: string | null;
+  daysSinceLastTimepoint: number;
+  toReviewCount: number;
+  agreementResult: string | null;
+  flagCount: number;
+  status: string;
+}
+
+export async function readingList(db: Db, projectId: string): Promise<ReadingListRow[]> {
+  const sites = await sitesForProject(db, projectId);
+  const now = new Date();
+
+  const rows: ReadingListRow[] = [];
+
+  for (const s of sites) {
+    const agreement = await latestAgreement(db, s.id);
+
+    const evidence = await evidenceForSite(db, s.id);
+    const assessments = await assessmentsForSite(db, s.id);
+
+    const latestAssessment = assessments.at(-1);
+    const latestGrade = latestAssessment?.grade ?? null;
+
+    const timepoints = [...new Set(evidence.map((e) => e.timepoint).filter(Boolean))] as string[];
+    timepoints.sort();
+    const lastReadingDate = timepoints.at(-1) ?? null;
+
+    let daysSinceLastTimepoint = 999;
+    if (lastReadingDate) {
+      const diffMs = now.getTime() - new Date(lastReadingDate).getTime();
+      daysSinceLastTimepoint = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    const needsReviewCount =
+      evidence.filter((e) => e.status === "needs_review").length +
+      assessments.filter((a) => a.status === "needs_review").length;
+
+    const flagCount = evidence
+      .filter((e) => e.status !== "set_aside")
+      .reduce((sum, e) => sum + (e.flags?.length ?? 0), 0);
+
+    rows.push({
+      site: s,
+      latestGrade,
+      lastReadingDate,
+      daysSinceLastTimepoint,
+      toReviewCount: needsReviewCount,
+      agreementResult: agreement?.result ?? null,
+      flagCount,
+      status: latestAssessment?.status ?? (evidence.length > 0 ? "active" : "pending"),
+    });
+  }
+
+  // Sort: [contested ? 0 : 1, flags > 0 ? 0 : 1, needsReview > 0 ? 0 : 1, pending > 0 ? 0 : 1, daysSinceLastTimepoint > 7 ? 0 : 1, -(needsReview + flags)]
+  rows.sort((a, b) => {
+    const aContested = a.agreementResult === "contradicts" ? 0 : 1;
+    const bContested = b.agreementResult === "contradicts" ? 0 : 1;
+    if (aContested !== bContested) return aContested - bContested;
+
+    const aFlags = a.flagCount > 0 ? 0 : 1;
+    const bFlags = b.flagCount > 0 ? 0 : 1;
+    if (aFlags !== bFlags) return aFlags - bFlags;
+
+    const aRev = a.toReviewCount > 0 ? 0 : 1;
+    const bRev = b.toReviewCount > 0 ? 0 : 1;
+    if (aRev !== bRev) return aRev - bRev;
+
+    const aPending = a.status === "pending" ? 0 : 1;
+    const bPending = b.status === "pending" ? 0 : 1;
+    if (aPending !== bPending) return aPending - bPending;
+
+    const aStale = a.daysSinceLastTimepoint > 7 ? 0 : 1;
+    const bStale = b.daysSinceLastTimepoint > 7 ? 0 : 1;
+    if (aStale !== bStale) return aStale - bStale;
+
+    const aTie = -(a.toReviewCount + a.flagCount);
+    const bTie = -(b.toReviewCount + b.flagCount);
+    return aTie - bTie;
+  });
+
+  return rows;
+}
+
+
 
 
