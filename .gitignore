@@ -1,8 +1,21 @@
+# deps & builds
 node_modules/
 .next/
-dist/
-coverage/
-.env.local
-.env.*.local
-*.log
+out/
+*.tsbuildinfo
+next-env.d.ts
+# env
+.env
+.env.*
+!.env.example
+# python
+cv/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# impeccable local
+.impeccable/config.local.json
+.impeccable/review/
+# misc
 .DS_Store
+archive/scratch/
