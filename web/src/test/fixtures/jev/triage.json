@@ -1,0 +1,53 @@
+{
+  "latencyMs": 1132,
+  "model": "jev-1.13.0",
+  "answers": {
+    "a0_relevance": {
+      "type": "choice",
+      "choice": "evidence",
+      "confidence": 1,
+      "probabilities": {
+        "unusable_quality": 0,
+        "evidence": 1,
+        "screenshot_or_meme": 0,
+        "people_only": 0
+      }
+    },
+    "a1_relevance": {
+      "type": "choice",
+      "choice": "screenshot_or_meme",
+      "confidence": 1,
+      "probabilities": {
+        "unusable_quality": 0,
+        "evidence": 0,
+        "screenshot_or_meme": 1,
+        "people_only": 0
+      }
+    },
+    "a0_grade": {
+      "type": "score",
+      "score": 1.56,
+      "confidence": 0.55,
+      "legend": {
+        "0": "Degraded",
+        "1": "No change",
+        "2": "Partially established",
+        "3": "Established"
+      },
+      "probabilities": {
+        "0": 0.14,
+        "1": 0.16,
+        "2": 0.7,
+        "3": 0
+      }
+    },
+    "a0_people": {
+      "type": "noul",
+      "noul": 0.99
+    }
+  },
+  "usage": {
+    "input_tokens": 637,
+    "output_tokens": 161
+  }
+}
