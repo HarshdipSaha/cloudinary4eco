@@ -128,3 +128,29 @@ export async function latestAgreement(db: Db, siteId: string) {
 export async function recordOverride(db: Db, o: typeof t.overrides.$inferInsert) {
   await db.insert(t.overrides).values(o);
 }
+
+export async function insertReport(db: Db, r: typeof t.reports.$inferInsert) {
+  await db.insert(t.reports).values(r);
+}
+export async function insertSentences(db: Db, rows: (typeof t.reportSentences.$inferInsert)[]) {
+  if (rows.length) await db.insert(t.reportSentences).values(rows);
+}
+export async function report(db: Db, id: string) {
+  return (await db.select().from(t.reports).where(eq(t.reports.id, id)))[0] ?? null;
+}
+export async function reportBySlug(db: Db, slug: string) {
+  return (await db.select().from(t.reports).where(eq(t.reports.publicSlug, slug)))[0] ?? null;
+}
+export async function reportsForProject(db: Db, projectId: string) {
+  return db.select().from(t.reports).where(eq(t.reports.projectId, projectId)).orderBy(desc(t.reports.createdAt));
+}
+export async function sentencesFor(db: Db, reportId: string) {
+  return db.select().from(t.reportSentences).where(eq(t.reportSentences.reportId, reportId)).orderBy(t.reportSentences.ordinal);
+}
+export async function evidenceByIds(db: Db, ids: string[]) {
+  return ids.length ? db.select().from(t.evidence).where(inArray(t.evidence.assetId, ids)) : [];
+}
+export async function agreementsForSite(db: Db, siteId: string) {
+  return db.select().from(t.agreements).where(eq(t.agreements.siteId, siteId)).orderBy(desc(t.agreements.createdAt));
+}
+
