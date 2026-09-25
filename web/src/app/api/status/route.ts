@@ -12,9 +12,11 @@ async function check(fn: () => Promise<string>): Promise<S> {
   try {
     return { state: "up", detail: await fn(), checkedAt };
   } catch (e) {
-    return { state: "down", detail: (e as Error).message.slice(0, 120), checkedAt };
+    const msg = (e as any)?.message || (e as any)?.error?.message || String(e);
+    return { state: "down", detail: String(msg).slice(0, 120), checkedAt };
   }
 }
+
 
 export async function GET() {
   if (cache && Date.now() - cache.at < 30_000) return NextResponse.json(cache.value);

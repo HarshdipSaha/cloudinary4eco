@@ -45,6 +45,10 @@ export async function GET(req: Request) {
       items,
     });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
+
+    const msg = (err as any)?.message || (err as any)?.error?.message || String(err);
+    console.error("Search API failed:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
