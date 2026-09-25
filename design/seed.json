@@ -1,0 +1,38 @@
+{
+  "projects": [
+    {
+      "id": "yamuna-green",
+      "name": "Yamuna Green Corridor",
+      "type": "plantation",
+      "sites": [
+        {
+          "id": "plot-b",
+          "name": "Plot B",
+          "description": "Riverside strip by the Nigambodh Ghat, sapling grid section 4",
+          "lat": 28.614,
+          "lon": 77.2094,
+          "radiusM": 100,
+          "qrSlug": "plot-b"
+        },
+        {
+          "id": "plot-c",
+          "name": "Plot C",
+          "description": "Boundary stretch along Government Senior Secondary School wall",
+          "lat": 28.625,
+          "lon": 77.218,
+          "radiusM": 100,
+          "qrSlug": "plot-c"
+        }
+      ],
+      "claims": [
+        {
+          "id": "q4-plot-b",
+          "siteId": "plot-b",
+          "periodStart": "2026-09-20",
+          "periodEnd": "2026-10-11",
+          "text": "300 native saplings planted, protected with tree guards, and established in Plot B"
+        }
+      ]
+    }
+  ]
+}
