@@ -88,9 +88,9 @@ export async function evidenceForSite(db: Db, siteId: string) {
   return db.select().from(t.evidence).where(eq(t.evidence.siteId, siteId)).orderBy(t.evidence.capturedAt);
 }
 export async function priorHashes(db: Db, projectId: string) {
-  return (await db.select({ assetId: t.evidence.assetId, siteId: t.evidence.siteId, phash: t.evidence.phash, capturedAt: t.evidence.capturedAt })
+  return (await db.select({ assetId: t.evidence.assetId, siteId: t.evidence.siteId, phash: t.evidence.phash, capturedAt: t.evidence.capturedAt, batchId: t.evidence.batchId })
     .from(t.evidence).where(and(eq(t.evidence.projectId, projectId), isNotNull(t.evidence.phash))))
-    .map((r) => ({ assetId: r.assetId, siteId: r.siteId, phash: r.phash!, capturedAt: r.capturedAt ? r.capturedAt.toISOString() : null }));
+    .map((r) => ({ assetId: r.assetId, siteId: r.siteId, phash: r.phash!, capturedAt: r.capturedAt ? r.capturedAt.toISOString() : null, batchId: r.batchId }));
 }
 
 export async function batchUsage(db: Db, batchId: string) {
