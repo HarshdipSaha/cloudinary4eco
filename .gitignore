@@ -18,7 +18,5 @@ __pycache__/
 .impeccable/review/
 # misc
 .DS_Store
-archive/scratch/
 .data/
 web/.data/
-

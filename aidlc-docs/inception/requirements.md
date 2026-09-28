@@ -1,6 +1,6 @@
 # SAAKSHYA — Requirements Baseline
 
-Source: reverse-engineered from `PRODUCT.md`, `SPECIFICATION_DOCUMENT.md`, `DESIGN.md` and
+Source: reverse-engineered from `docs/PRODUCT.md`, `docs/SPECIFICATION_DOCUMENT.md`, `docs/DESIGN.md` and
 live behavior verified by hand-testing on 2026-09-25. Not re-interviewed with the user because
 these documents already encode the product's requirements in detail.
 

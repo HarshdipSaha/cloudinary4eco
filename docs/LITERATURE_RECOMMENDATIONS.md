@@ -1,6 +1,6 @@
 # Literature Scan → Spec/Plan Recommendations
 
-**Scope:** arXiv + web search pass against the current spec (`SPECIFICATION_DOCUMENT.md`) and plan (`docs/superpowers/plans/2026-09-24-saakshya.md`), run 25 Sep 2026, against work completed through Task 19 (registration + change metrics in `cv/`).
+**Scope:** arXiv + web search pass against the current spec (`docs/SPECIFICATION_DOCUMENT.md`) and plan (`docs/superpowers/plans/2026-09-24-saakshya.md`), run 25 Sep 2026, against work completed through Task 19 (registration + change metrics in `cv/`).
 
 **How to read this doc:** each section is one pipeline stage. Papers are listed with what they actually say, then a recommendation graded **Do it** (cheap, strengthens the demo or judge Q&A), **Consider** (real upside, costs time you may not have before 2/11 Oct), or **Note only** (good to cite when a judge asks "did you look at X", not worth building). Nothing here contradicts the non-negotiable rules in plan §0.3 — Cloudinary perceives, deterministic code measures, Jev decides, the LLM only drafts.
 

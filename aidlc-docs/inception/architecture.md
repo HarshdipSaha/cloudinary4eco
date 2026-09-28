@@ -1,6 +1,6 @@
 # SAAKSHYA — Architecture Baseline
 
-Reverse-engineered from `web/src` on 2026-09-25. Two deployables per `PRODUCT.md`: this Next.js
+Reverse-engineered from `web/src` on 2026-09-25. Two deployables per `docs/PRODUCT.md`: this Next.js
 web app, and a separate Python CV worker (`cv/`, FastAPI + OpenCV, not covered in depth here
 since it wasn't running/modified in this effort).
 

@@ -4,6 +4,17 @@ Verifiable impact tracking for NGOs, CSR teams and civic bodies.
 
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/07b68a33-2e87-4e0c-8c41-607d4385dbff" />
 
+## Documentation
+
+- [Product overview](docs/PRODUCT.md)
+- [Technical specification](docs/SPECIFICATION_DOCUMENT.md)
+- [Design system](docs/DESIGN.md)
+- [Cloudinary integration guide](docs/CLOUDINARY.md)
+- [Demo script](docs/DEMO_SCRIPT.md)
+- [Problem statement research](docs/PROBLEM_STATEMENT_02_DEEP_RESEARCH.md)
+- [Cloudinary media intelligence research](docs/CLOUDINARY_MEDIA_INTELLIGENCE_RESEARCH.md)
+- [Literature recommendations](docs/LITERATURE_RECOMMENDATIONS.md)
+
 ---
 
 ## What It Solves
