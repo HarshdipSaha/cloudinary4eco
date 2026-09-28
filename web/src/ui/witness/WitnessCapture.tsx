@@ -72,14 +72,21 @@ export function WitnessCapture({
   async function startCamera() {
     setCameraError(false);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-        },
-        audio: false,
-      });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+          audio: false,
+        });
+      } catch {
+        // No rear camera (e.g. a laptop webcam) — fall back to whatever camera exists
+        // instead of giving up on the live viewfinder entirely.
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      }
       setPhase("camera");
       setTimeout(() => {
         if (videoRef.current) {

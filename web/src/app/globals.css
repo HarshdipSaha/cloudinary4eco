@@ -55,6 +55,13 @@
   --color-attention: var(--attention);
   --color-flag: var(--flag);
   --color-plate-mat: var(--plate-mat);
+  /* Public (paper) pages: aliases so bg-paper/text-paper-ink/etc. resolve
+     to the theme's surface/text tokens instead of compiling to nothing. */
+  --color-paper: var(--surface-0);
+  --color-paper-ink: var(--text);
+  --color-paper-ink-muted: var(--text-2);
+  --color-paper-surface: var(--surface-1);
+  --color-paper-line: var(--line);
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
   --font-serif: var(--font-source-serif), Georgia, serif;
