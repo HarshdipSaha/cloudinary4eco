@@ -2,7 +2,7 @@
 
 Verifiable impact tracking for NGOs, CSR teams and civic bodies.
 
-Built for Code Cubicle 6.0 - Problem Statement 02 (Cloudinary Track).
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/07b68a33-2e87-4e0c-8c41-607d4385dbff" />
 
 ---
 
