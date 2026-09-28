@@ -12,6 +12,7 @@ import type { ProjectType } from "@/domain/types";
 const Body = z.object({
   assetId: z.string().min(1),
   comment: z.string().optional(),
+  gps: z.object({ lat: z.number(), lon: z.number() }).optional(),
 });
 
 export async function POST(req: Request, props: { params: Promise<{ slug: string }> }) {
@@ -29,7 +30,14 @@ export async function POST(req: Request, props: { params: Promise<{ slug: string
       siteId: site.id,
       assetIds: [body.assetId],
       batchId,
-      meta: body.comment ? { [body.assetId]: { comment: body.comment } } : undefined,
+      meta: {
+        [body.assetId]: {
+          comment: body.comment,
+          gps: body.gps,
+          sentAt: new Date().toISOString(),
+          timeSource: "the time the photo reached the server",
+        },
+      },
     });
 
     const item = await repo.evidenceItem(d.db, body.assetId);

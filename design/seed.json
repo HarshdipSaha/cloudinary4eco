@@ -22,6 +22,15 @@
           "lon": 77.218,
           "radiusM": 100,
           "qrSlug": "plot-c"
+        },
+        {
+          "id": "plot-d",
+          "name": "Desert Afforestation Block",
+          "description": "Thar Desert afforestation block, Jaisalmer",
+          "lat": 26.9157,
+          "lon": 70.9083,
+          "radiusM": 150,
+          "qrSlug": "plot-d"
         }
       ],
       "claims": [
@@ -31,6 +40,13 @@
           "periodStart": "2026-09-20",
           "periodEnd": "2026-10-11",
           "text": "300 native saplings planted, protected with tree guards, and established in Plot B"
+        },
+        {
+          "id": "q4-plot-d",
+          "siteId": "plot-d",
+          "periodStart": "2026-09-01",
+          "periodEnd": "2026-12-31",
+          "text": "Monsoon plantation drive completed across the desert afforestation block, saplings thriving on regular rainfall"
         }
       ]
     }

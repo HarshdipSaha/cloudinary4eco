@@ -3,8 +3,27 @@ import { haversineM } from "./geo";
 import { hamming } from "./phash";
 import { timepointOf } from "./timepoint";
 import { THRESHOLDS } from "./thresholds";
+import type { DailyWeather } from "@/ports/weather";
 
 export interface PriorHash { assetId: string; siteId: string | null; phash: string; capturedAt: string | null }
+
+const WET_CLAIM_KEYWORDS = ["monsoon", "rain", "rains", "rainy", "downpour", "flood", "flooded"];
+const WET_MISMATCH_MAX_PRECIP_MM = 1;
+const WET_MISMATCH_MIN_TEMP_C = 30;
+
+/** A hard fraud signal Jev never sees: does the claim's own words match what actually happened at that GPS+date? */
+export function checkWeatherPlausibility({ claimText, weather }: { claimText: string | null; weather: DailyWeather | null }): Flag[] {
+  if (!weather) return [];
+  const claimsWet = claimText != null && WET_CLAIM_KEYWORDS.some((k) => claimText.toLowerCase().includes(k));
+  if (claimsWet && weather.precipitationMm <= WET_MISMATCH_MAX_PRECIP_MM && weather.tempMaxC >= WET_MISMATCH_MIN_TEMP_C) {
+    return [{
+      kind: "weather_mismatch",
+      detail: `Claim describes monsoon/rain conditions, but recorded weather that day was ${weather.tempMaxC.toFixed(0)}°C with ${weather.precipitationMm.toFixed(1)} mm precipitation.`,
+      relatedAssetIds: [],
+    }];
+  }
+  return [];
+}
 
 export interface IntegrityInput {
   analysis: MediaAnalysis;

@@ -22,6 +22,7 @@ const FLAG_LABEL: Record<FlagKind, string> = {
   location_inferred: "No GPS",
   capture_time_from_chat: "Time from chat",
   date_unknown: "No capture time",
+  weather_mismatch: "Weather mismatch",
 };
 
 export function flagSpec(k: FlagKind) {

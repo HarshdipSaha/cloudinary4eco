@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "vercel-build": "drizzle-kit migrate && next build",
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -28,7 +29,7 @@
     "idb-keyval": "^6.2.1",
     "lucide-react": "^0.475.0",
     "nanoid": "^5.0.9",
-    "next": "15.1.6",
+    "next": "^15.1.12",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

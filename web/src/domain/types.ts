@@ -18,9 +18,10 @@ export type FlagKind =
   | "duplicate"
   | "location_inferred"
   | "capture_time_from_chat"
-  | "date_unknown";
+  | "date_unknown"
+  | "weather_mismatch";
 export const INTEGRITY_FLAGS: readonly FlagKind[] = [
-  "recycled_image", "date_out_of_period", "outside_site_radius", "possible_different_location",
+  "recycled_image", "date_out_of_period", "outside_site_radius", "possible_different_location", "weather_mismatch",
 ];
 export interface Flag { kind: FlagKind; detail: string; relatedAssetIds: string[] }
 

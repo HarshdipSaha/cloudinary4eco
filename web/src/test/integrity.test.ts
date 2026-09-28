@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { checkIntegrity, type PriorHash } from "@/domain/integrity";
+import { checkIntegrity, checkWeatherPlausibility, type PriorHash } from "@/domain/integrity";
 import type { MediaAnalysis, Site } from "@/domain/types";
 
 const site: Site = { id: "s1", projectId: "p", name: "Plot B", description: "", location: { lat: 28.6, lon: 77.2 }, radiusM: 100, baselineAssetId: "base", qrSlug: "q" };
@@ -43,5 +43,25 @@ describe("checkIntegrity", () => {
   it("ignores its own prior entry", () => {
     const priors: PriorHash[] = [{ assetId: "x", siteId: "s1", phash: base.phash!, capturedAt: base.capturedAt }];
     expect(checkIntegrity({ analysis: base, site, period, priors })).toEqual([]);
+  });
+});
+
+describe("checkWeatherPlausibility", () => {
+  it("flags a monsoon claim against a hot, dry recorded day", () => {
+    const f = checkWeatherPlausibility({
+      claimText: "Monsoon plantation drive completed across the site",
+      weather: { tempMaxC: 38, tempMinC: 27, precipitationMm: 0 },
+    });
+    expect(f.map((x) => x.kind)).toEqual(["weather_mismatch"]);
+    expect(f[0]!.detail).toMatch(/38.*0\.0 mm/);
+  });
+  it("does not flag a monsoon claim when it actually rained", () => {
+    expect(checkWeatherPlausibility({ claimText: "monsoon plantation drive", weather: { tempMaxC: 26, tempMinC: 22, precipitationMm: 40 } })).toEqual([]);
+  });
+  it("does not flag a claim with no wet-weather keywords", () => {
+    expect(checkWeatherPlausibility({ claimText: "300 saplings planted", weather: { tempMaxC: 38, tempMinC: 27, precipitationMm: 0 } })).toEqual([]);
+  });
+  it("does nothing when weather data is unavailable", () => {
+    expect(checkWeatherPlausibility({ claimText: "monsoon plantation drive", weather: null })).toEqual([]);
   });
 });

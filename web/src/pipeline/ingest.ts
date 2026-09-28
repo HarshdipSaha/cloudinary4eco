@@ -4,8 +4,9 @@ import type { EvidenceSource, EvidenceStatus, Flag, LatLon, MediaAnalysis, Proje
 import type { MediaPort } from "@/ports/media";
 import { DecisionsUnavailable, type DecisionsPort, type TriageInput, type TriageResult } from "@/ports/decisions";
 import { RegistrationUnavailable, type RegistrationPort } from "@/ports/registration";
+import { WeatherUnavailable, type WeatherPort } from "@/ports/weather";
 import { nearestSites } from "@/domain/geo";
-import { checkIntegrity, type PriorHash } from "@/domain/integrity";
+import { checkIntegrity, checkWeatherPlausibility, type PriorHash } from "@/domain/integrity";
 import { decideStatus } from "@/domain/status";
 import { THRESHOLDS } from "@/domain/thresholds";
 import { timepointOf } from "@/domain/timepoint";
@@ -17,6 +18,7 @@ export interface PipelineDeps {
   media: MediaPort;
   decisions: DecisionsPort;
   registration: RegistrationPort;
+  weather: WeatherPort;
 }
 
 export interface AssetMeta {
@@ -96,7 +98,7 @@ export function candidatesFor(a: MediaAnalysis, sites: Site[]): TriageInput["can
 }
 
 export async function ingestBatch(deps: PipelineDeps, req: IngestRequest, emit: (e: PipelineEvent) => void = () => {}) {
-  const { db, media, decisions, registration } = deps;
+  const { db, media, decisions, registration, weather } = deps;
   const project = await repo.project(db, req.projectId);
   if (!project) throw new Error(`Unknown project ${req.projectId}`);
   const type = project.type as ProjectType;
@@ -176,6 +178,16 @@ export async function ingestBatch(deps: PipelineDeps, req: IngestRequest, emit: 
         (f) => !(f.kind === "location_inferred" && req.siteId)
       ), // QR location is known
     ];
+
+    if (a.gps && day && claim?.text) {
+      try {
+        const w = await weather.historical({ lat: a.gps.lat, lon: a.gps.lon, date: day });
+        flags.push(...checkWeatherPlausibility({ claimText: claim.text, weather: w }));
+      } catch (e) {
+        if (!(e instanceof WeatherUnavailable)) throw e;
+        // Weather is a bonus signal, not a hard dependency; skip silently rather than blocking triage.
+      }
+    }
 
     let reg: RegistrationResult | null = null;
     let regPending = false;

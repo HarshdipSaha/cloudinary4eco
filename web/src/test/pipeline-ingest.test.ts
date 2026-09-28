@@ -145,6 +145,21 @@ describe("ingestBatch", () => {
     expect(await item("f9")).toMatchObject({ status: "pending", statusReason: "Alignment pending: CV worker unavailable" });
   });
 
+  it("flags a monsoon claim contradicted by a hot, dry recorded day at the site", async () => {
+    await repo.createClaim(w.db, {
+      id: "c2", projectId: "p1", siteId: "s2",
+      periodStart: "2026-09-20", periodEnd: "2026-10-10",
+      text: "Monsoon plantation drive completed across Plot C",
+    });
+    w.weather.byDate["2026-09-28"] = { tempMaxC: 38, tempMinC: 27, precipitationMm: 0 };
+    w.media.add(analysis("f10", { gps: { lat: 28.65, lon: 77.25 } }));
+    w.decisions.site.f10 = "s2";
+    await run(["f10"]);
+    const e = await item("f10");
+    expect(e?.flags.map((f) => f.kind)).toContain("weather_mismatch");
+    expect(w.weather.calls).toEqual([{ lat: 28.65, lon: 77.25, date: "2026-09-28" }]);
+  });
+
   it("skips site assignment for witness submissions from a site QR", async () => {
     w.media.add(analysis("wit1"));
     await ingestBatch(w.deps, { projectId: "p1", source: "witness", assetIds: ["wit1"], batchId: "b2", siteId: "s1" });

@@ -10,10 +10,12 @@ import {
   FileText,
   ShieldCheck,
   Settings,
+  Camera,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/sites", label: "Reading", icon: LineChart },
+  { href: "/witness", label: "Witness", icon: Camera },
   { href: "/intake", label: "Intake", icon: Inbox },
   { href: "/review", label: "Review", icon: CheckSquare },
   { href: "/search", label: "Search", icon: Search },

@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-09-25T06:38:32.533Z",
+  "baseUrl": "http://localhost:3000",
+  "routesTested": [
+    "/",
+    "/search",
+    "/intake",
+    "/review",
+    "/sites/plot-b",
+    "/trust",
+    "/reports",
+    "/setup",
+    "/plaque/plot-b",
+    "/w/plot-b",
+    "/s/plot-b"
+  ],
+  "consoleErrors": [
+    {
+      "url": "http://localhost:3000/review",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    }
+  ],
+  "pageErrors": [],
+  "overflows": [],
+  "interactions": [
+    {
+      "name": "Search Input 'saplings'",
+      "status": "passed",
+      "detail": "Search query executed without throwing Error: Search failed"
+    },
+    {
+      "name": "Search Button Click",
+      "status": "passed",
+      "detail": "Search button clicked and returned clean 200 response"
+    },
+    {
+      "name": "WhatsApp ZIP Upload",
+      "status": "passed",
+      "detail": "Successfully attached whatsapp_field_export.zip"
+    },
+    {
+      "name": "Spacebar Flicker & 'E' Key Hotkeys",
+      "status": "passed",
+      "detail": "Dispatched Spacebar and 'E' keypresses to Hanging Protocol"
+    }
+  ]
+}

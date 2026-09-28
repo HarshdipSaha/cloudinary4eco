@@ -1,12 +1,13 @@
 import { createTestDb, type Db } from "@/ledger/db";
 import * as repo from "@/ledger/repo";
-import { FakeDecisions, FakeMedia, FakeRegistration, analysis } from "./fakes";
+import { FakeDecisions, FakeMedia, FakeRegistration, FakeWeather, analysis } from "./fakes";
 
 export async function world() {
   const db: Db = await createTestDb();
   const media = new FakeMedia();
   const decisions = new FakeDecisions();
   const registration = new FakeRegistration();
+  const weather = new FakeWeather();
   await repo.createProject(db, { id: "p1", name: "Yamuna Green", type: "plantation" });
   await repo.createSite(db, {
     id: "s1",
@@ -64,5 +65,5 @@ export async function world() {
   });
   await repo.setBaseline(db, "s1", "base-s1");
 
-  return { db, media, decisions, registration, deps: { db, media, decisions, registration } };
+  return { db, media, decisions, registration, weather, deps: { db, media, decisions, registration, weather } };
 }

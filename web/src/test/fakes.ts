@@ -3,6 +3,7 @@ import type { MediaPort } from "@/ports/media";
 import { DecisionsUnavailable, type DecisionsPort } from "@/ports/decisions";
 import { RegistrationUnavailable, type RegistrationPort } from "@/ports/registration";
 import type { DrafterPort } from "@/ports/drafter";
+import { WeatherUnavailable, type DailyWeather, type WeatherPort } from "@/ports/weather";
 
 export function analysis(assetId: string, over: Partial<MediaAnalysis> = {}): MediaAnalysis {
   return {
@@ -124,6 +125,17 @@ export class FakeRegistration implements RegistrationPort {
     this.calls.push(i.followupAssetId);
     if (this.unavailable) throw new RegistrationUnavailable("CV worker down (fake)");
     return this.results[i.followupAssetId] ?? goodRegistration(i.followupAssetId);
+  }
+}
+
+export class FakeWeather implements WeatherPort {
+  unavailable = false;
+  byDate: Record<string, DailyWeather> = {};
+  calls: { lat: number; lon: number; date: string }[] = [];
+  async historical(i: Parameters<WeatherPort["historical"]>[0]) {
+    this.calls.push(i);
+    if (this.unavailable) throw new WeatherUnavailable("Open-Meteo down (fake)");
+    return this.byDate[i.date] ?? null;
   }
 }
 
