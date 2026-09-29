@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { getDb } from "@/ledger/db";
 import * as repo from "@/ledger/repo";
 import { ShieldCheck } from "lucide-react";
+import { publicOrigin } from "@/lib/public-origin";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,7 @@ export default async function PlaquePrintPage(props: {
   const site = await repo.siteBySlug(db, slug);
   if (!site) notFound();
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://saakshya.org";
-  const witnessUrl = `${baseUrl}/w/${site.qrSlug ?? slug}`;
+  const witnessUrl = `${publicOrigin()}/w/${site.qrSlug ?? slug}`;
 
   // Generate QR code SVG
   const qrSvg = await QRCode.toString(witnessUrl, {
@@ -59,14 +59,20 @@ export default async function PlaquePrintPage(props: {
 
           {/* QR Code SVG container */}
           <div
+            data-witness-url={witnessUrl}
             className="flex items-center justify-center p-3 rounded-[4px] border border-paper-line bg-white shadow-xs [&>svg]:w-[52mm] [&>svg]:h-[52mm]"
             dangerouslySetInnerHTML={{ __html: qrSvg }}
           />
 
           {/* Short URL in mono */}
-          <div className="font-mono text-[13px] font-medium text-paper-ink">
+          <a
+            href={witnessUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono text-[13px] font-medium text-paper-ink underline underline-offset-2"
+          >
             {witnessUrl}
-          </div>
+          </a>
         </div>
 
         {/* Bottom Note */}
