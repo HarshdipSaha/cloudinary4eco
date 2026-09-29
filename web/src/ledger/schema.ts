@@ -35,10 +35,25 @@ export const claims = pgTable("claims", {
   text: text("text").notNull(),
 });
 
+export const publicVideoImports = pgTable("public_video_imports", {
+  id: text("id").primaryKey(),
+  projectId: text("project_id").notNull().references(() => projects.id),
+  siteId: text("site_id").notNull().references(() => sites.id),
+  sourceUrl: text("source_url").notNull(),
+  permissionNote: text("permission_note").notNull(),
+  remoteVideoAssetId: text("remote_video_asset_id").notNull(),
+  durationSeconds: doublePrecision("duration_seconds").notNull(),
+  status: text("status").notNull(),
+  statusReason: text("status_reason"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const evidence = pgTable("evidence", {
   assetId: text("asset_id").primaryKey(),
   projectId: text("project_id").notNull().references(() => projects.id),
   siteId: text("site_id").references(() => sites.id),
+  videoImportId: text("video_import_id").references(() => publicVideoImports.id),
+  frameSecond: doublePrecision("frame_second"),
   batchId: text("batch_id"),
   source: text("source").notNull(),
   status: text("status").notNull(),

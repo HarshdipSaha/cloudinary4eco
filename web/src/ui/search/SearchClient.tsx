@@ -6,6 +6,7 @@ import { Button } from "@/ui/Button";
 import { Drawer } from "@/ui/intake/Drawer";
 import type { IntakeRow } from "@/ui/intake/useIntake";
 import { Search as SearchIcon, Filter, AlertCircle, Sparkles } from "lucide-react";
+import { PublicVideoDialog } from "@/ui/search/PublicVideoDialog";
 
 interface SearchResultItem {
   assetId: string;
@@ -39,6 +40,7 @@ export function SearchClient({
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
 
   const siteMap = new Map(sites.map((s) => [s.id, s.name]));
 
@@ -154,14 +156,14 @@ export function SearchClient({
               className="h-11 w-full rounded-[2px] border border-line bg-surface-0 pl-10 pr-4 text-[14px] text-text placeholder:text-text-3 focus:border-measure focus:outline-hidden"
             />
           </div>
-          <Button
-            variant="primary"
-            onClick={performSearch}
-            disabled={loading}
-            className="h-11 px-5"
-          >
-            {loading ? "Searching..." : "Search Evidence"}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="quiet" onClick={() => setVideoDialogOpen(true)} className="h-11 px-4">
+              Analyse public video
+            </Button>
+            <Button variant="primary" onClick={performSearch} disabled={loading} className="h-11 px-5">
+              {loading ? "Searching..." : "Search Evidence"}
+            </Button>
+          </div>
         </div>
 
         {/* Filter Row */}
@@ -343,6 +345,17 @@ export function SearchClient({
           performSearch();
         }}
       />
+      {videoDialogOpen && (
+        <PublicVideoDialog
+          projectId={projectId}
+          sites={sites}
+          onClose={() => setVideoDialogOpen(false)}
+          onComplete={() => {
+            setVideoDialogOpen(false);
+            performSearch();
+          }}
+        />
+      )}
     </div>
   );
 }

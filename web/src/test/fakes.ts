@@ -37,6 +37,15 @@ export class FakeMedia implements MediaPort {
     if (!a) throw new Error(`FakeMedia: no analysis for ${id}`);
     return structuredClone(a);
   }
+  async importPublicVideo(input: { sourceUrl: string; folder: string }) {
+    return { assetId: `${input.folder}/video`, secureUrl: input.sourceUrl, durationSeconds: 100, width: 1280, height: 720 };
+  }
+  async renderVideoFrame(input: { videoAssetId: string; atSecond: number; folder: string }) {
+    const id = `${input.folder}/frame-${input.atSecond}`;
+    const a = analysis(id, { secureUrl: `https://res.cloudinary.com/demo/image/upload/${id}` });
+    this.add(a);
+    return structuredClone(a);
+  }
   signUpload() {
     return { cloudName: "demo", apiKey: "k", timestamp: 1, signature: "sig", params: {} };
   }
@@ -45,6 +54,9 @@ export class FakeMedia implements MediaPort {
   }
   async destroy(id: string) {
     this.destroyed.push(id);
+  }
+  async destroyVideo(id: string) {
+    this.destroyed.push(`video:${id}`);
   }
   async searchIds() {
     return this.searchResult;

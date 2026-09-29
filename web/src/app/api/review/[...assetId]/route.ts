@@ -22,9 +22,10 @@ export async function GET(req: Request, props: { params: Promise<{ assetId: stri
     if (!e) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const decs = await repo.decisionsFor(d.db, assetId);
     const deriv = await repo.derivativeFor(d.db, assetId);
+    const publicVideoImport = e.videoImportId ? await repo.publicVideoImport(d.db, e.videoImportId) : null;
     const s = e.siteId ? await repo.site(d.db, e.siteId) : null;
     const allSites = await repo.sitesForProject(d.db, e.projectId);
-    return NextResponse.json({ evidence: e, decisions: decs, derivative: deriv, site: s, sites: allSites });
+    return NextResponse.json({ evidence: e, decisions: decs, derivative: deriv, publicVideoImport, site: s, sites: allSites });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
@@ -54,6 +55,10 @@ export async function DELETE(_req: Request, props: { params: Promise<{ assetId: 
   try {
     const assetId = (await props.params).assetId.join("/");
     const d = await deps();
+    const evidence = await repo.evidenceItem(d.db, assetId);
+    if (evidence?.videoImportId) {
+      return NextResponse.json({ error: "Delete the entire public video import so its shared source remains auditable." }, { status: 400 });
+    }
     const { assetIds } = await repo.mediaAssetsForEvidenceDeletion(d.db, assetId);
 
     // Delete Cloudinary resources first. If that fails, the ledger entry remains available.

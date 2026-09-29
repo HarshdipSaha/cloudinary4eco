@@ -24,6 +24,37 @@ export function cloudinaryGateway(): MediaPort {
       return toMediaAnalysis(r);
     },
 
+    async importPublicVideo({ sourceUrl, folder }) {
+      const result = await cloudinary.uploader.upload(sourceUrl, {
+        resource_type: "video",
+        folder,
+        unique_filename: true,
+        use_filename: false,
+      });
+      return {
+        assetId: result.public_id,
+        secureUrl: result.secure_url,
+        durationSeconds: Number(result.duration ?? 0),
+        width: Number(result.width ?? 0),
+        height: Number(result.height ?? 0),
+      };
+    },
+
+    async renderVideoFrame({ videoAssetId, atSecond, folder }) {
+      const sourceUrl = cloudinary.url(videoAssetId, {
+        secure: true,
+        resource_type: "video",
+        transformation: [{ start_offset: atSecond, fetch_format: "jpg" }],
+      });
+      const result = await cloudinary.uploader.upload(sourceUrl, {
+        resource_type: "image",
+        folder,
+        public_id: `frame-${String(atSecond).replaceAll(".", "_")}`,
+        overwrite: true,
+      });
+      return toMediaAnalysis(await cloudinary.api.resource(result.public_id, { image_metadata: true, phash: true, faces: true, tags: true, context: true }));
+    },
+
     signUpload({ folder, context }) {
       const timestamp = Math.round(Date.now() / 1000);
       const params: Record<string, string> = { ...ANALYSIS_UPLOAD_PARAMS, folder, timestamp: String(timestamp) };
@@ -48,6 +79,13 @@ export function cloudinaryGateway(): MediaPort {
       const result = await cloudinary.uploader.destroy(assetId, { resource_type: "image", invalidate: true });
       if (result.result !== "ok" && result.result !== "not found") {
         throw new Error(`Cloudinary could not delete ${assetId}: ${result.result}`);
+      }
+    },
+
+    async destroyVideo(assetId) {
+      const result = await cloudinary.uploader.destroy(assetId, { resource_type: "video", invalidate: true });
+      if (result.result !== "ok" && result.result !== "not found") {
+        throw new Error(`Cloudinary could not delete video ${assetId}: ${result.result}`);
       }
     },
 

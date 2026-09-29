@@ -1,7 +1,7 @@
 export const PROJECT_TYPES = ["plantation", "cleanup", "water_point", "sanitation", "construction"] as const;
 export type ProjectType = (typeof PROJECT_TYPES)[number];
 
-export type EvidenceSource = "implementer" | "witness" | "bulk_import";
+export type EvidenceSource = "implementer" | "witness" | "bulk_import" | "web_video";
 export type EvidenceStatus = "pending" | "accepted" | "needs_review" | "set_aside";
 export const RELEVANCE = ["evidence", "people_only", "screenshot_or_meme", "unusable_quality"] as const;
 export type Relevance = (typeof RELEVANCE)[number];
