@@ -9,7 +9,7 @@ import { ProbabilityBar } from "@/ui/ProbabilityBar";
 import { FlagMark, StatusMark } from "@/ui/marks";
 import type { EvidenceStatus, FlagKind } from "@/domain/types";
 import { Button } from "@/ui/Button";
-import { X, Check, Ban, MapPin, Trash2 } from "lucide-react";
+import { X, Check, Ban, MapPin, Trash2, RefreshCw } from "lucide-react";
 
 interface DecisionRecord {
   id: number;
@@ -29,6 +29,7 @@ export function Drawer({
   onClose,
   onSelectAsset,
   onReviewed,
+  onRetried,
   onDeleted,
 }: {
   row: IntakeRow | null;
@@ -36,6 +37,7 @@ export function Drawer({
   onClose: () => void;
   onSelectAsset: (assetId: string) => void;
   onReviewed: (assetId: string, action: string, siteId?: string, reason?: string) => void;
+  onRetried: (assetId: string, result: { status: string; statusReason: string | null }) => void;
   onDeleted: (assetId: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
@@ -163,6 +165,29 @@ export function Drawer({
       }
       onDeleted(row.assetId);
       onClose();
+    } catch (err) {
+      setSubmitError((err as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleRetryAlignment() {
+    if (!row?.assetId || !detail?.evidence?.siteId) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch(`/api/sites/${encodeURIComponent(detail.evidence.siteId)}/retry-alignment`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ assetId: row.assetId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Alignment retry failed");
+
+      const detailRes = await fetch(`/api/review/${row.assetId}`);
+      if (detailRes.ok) setDetail(await detailRes.json());
+      onRetried(row.assetId, { status: data.status, statusReason: data.statusReason ?? null });
     } catch (err) {
       setSubmitError((err as Error).message);
     } finally {
@@ -412,6 +437,22 @@ export function Drawer({
 
                 {!reviewMode ? (
                   <div className="flex flex-wrap gap-2">
+                    {ev?.status === "pending" && ev?.statusReason === "Alignment pending: CV worker unavailable" && ev?.siteId && (
+                      <div className="w-full space-y-1.5">
+                        <Button
+                          variant="primary"
+                          onClick={handleRetryAlignment}
+                          disabled={submitting}
+                          className="gap-1.5"
+                        >
+                          <RefreshCw className={`h-3.5 w-3.5 ${submitting ? "animate-spin" : ""}`} />
+                          {submitting ? "Retrying alignment..." : "Retry alignment"}
+                        </Button>
+                        <p className="text-[11px] text-text-3">
+                          Reuses the stored Jev triage and retries only the photo alignment.
+                        </p>
+                      </div>
+                    )}
                     <Button
                       variant="primary"
                       onClick={() => setReviewMode("accept")}
