@@ -44,6 +44,10 @@ export function cloudinaryGateway(): MediaPort {
       const sourceUrl = cloudinary.url(videoAssetId, {
         secure: true,
         resource_type: "video",
+        // The Vercel serverless bundle cannot provide Cloudinary's URL analytics
+        // SDK version metadata. This URL is an internal frame fetch source, so
+        // analytics are unnecessary and can make Cloudinary reject the request.
+        urlAnalytics: false,
         transformation: [{ start_offset: atSecond, fetch_format: "jpg" }],
       });
       const result = await cloudinary.uploader.upload(sourceUrl, {
