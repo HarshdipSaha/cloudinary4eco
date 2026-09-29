@@ -339,6 +339,9 @@ export function SearchClient({
         onReviewed={() => {
           performSearch();
         }}
+        onDeleted={() => {
+          performSearch();
+        }}
       />
     </div>
   );
