@@ -7,10 +7,19 @@ export interface UploadSignature {
 
 export interface MediaPort {
   analyze(assetId: string): Promise<MediaAnalysis>;
+  importPublicVideo(input: { sourceUrl: string; folder: string }): Promise<{
+    assetId: string;
+    secureUrl: string;
+    durationSeconds: number;
+    width: number;
+    height: number;
+  }>;
+  renderVideoFrame(input: { videoAssetId: string; atSecond: number; folder: string }): Promise<MediaAnalysis>;
   signUpload(input: { folder: string; context?: Record<string, string> }): UploadSignature;
   setContext(assetId: string, context: Record<string, string>): Promise<void>;
   /** Permanently removes an uploaded image. Missing derived assets are treated as already removed. */
   destroy(assetId: string): Promise<void>;
+  destroyVideo(assetId: string): Promise<void>;
   /** Returns asset ids matching a Cloudinary search expression (filters only, no free text). */
   searchIds(expression: string, max: number): Promise<string[]>;
 }

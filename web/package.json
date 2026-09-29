@@ -13,6 +13,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "probe:cloudinary": "tsx scripts/probe-cloudinary.ts",
+    "probe:cloudinary-video": "tsx scripts/probe-cloudinary-video.ts",
     "probe:jev": "tsx scripts/probe-jev.ts",
     "seed": "tsx scripts/seed.ts",
     "calibrate": "tsx scripts/calibrate.ts"

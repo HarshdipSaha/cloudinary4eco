@@ -41,6 +41,7 @@ export function Drawer({
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<{
     evidence: any;
+    publicVideoImport: any;
     decisions: DecisionRecord[];
     derivative: any;
     site: any;
@@ -139,6 +140,26 @@ export function Drawer({
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Delete failed");
+      }
+      onDeleted(row.assetId);
+      onClose();
+    } catch (err) {
+      setSubmitError((err as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleDeletePublicVideoImport() {
+    const importId = detail?.publicVideoImport?.id;
+    if (!importId || !row?.assetId || !window.confirm("Delete this public video and all extracted frames? This cannot be undone.")) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch(`/api/public-video/${importId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Video import deletion failed");
       }
       onDeleted(row.assetId);
       onClose();
@@ -275,6 +296,24 @@ export function Drawer({
             </div>
 
             {/* 3. Jev Decisions */}
+            {detail?.publicVideoImport && (
+              <div className="space-y-2 rounded-[2px] border border-line bg-surface-0 p-3 text-[12px]">
+                <div className="mono text-[11px] font-semibold tracking-wider text-text-3 uppercase">Public video source</div>
+                <a href={detail.publicVideoImport.sourceUrl} target="_blank" rel="noreferrer" className="break-all text-measure underline underline-offset-2">
+                  {detail.publicVideoImport.sourceUrl}
+                </a>
+                <div className="mono text-[11px] text-text-3">
+                  Frame {ev?.frameSecond ?? 0}s · capture time and GPS unavailable unless separately verified.
+                </div>
+                <div className="text-[11px] text-text-3">Delete the entire import to remove this shared video and its frames.</div>
+                <Button variant="quiet" onClick={handleDeletePublicVideoImport} disabled={submitting} className="gap-1.5 text-flag hover:border-flag/60">
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Delete video import
+                </Button>
+              </div>
+            )}
+
+            {/* 3. Jev Decisions */}
             <div className="space-y-3">
               <div className="mono text-[11px] font-semibold tracking-wider text-text-3 uppercase">
                 Calibrated Decisions (Jev)
@@ -397,15 +436,17 @@ export function Drawer({
                       <MapPin className="h-3.5 w-3.5" />
                       Assign site
                     </Button>
-                    <Button
-                      variant="quiet"
-                      onClick={handleDelete}
-                      disabled={submitting}
-                      className="gap-1.5 text-flag hover:border-flag/60"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Delete photo
-                    </Button>
+                    {!ev?.videoImportId && (
+                      <Button
+                        variant="quiet"
+                        onClick={handleDelete}
+                        disabled={submitting}
+                        className="gap-1.5 text-flag hover:border-flag/60"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete photo
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 rounded-[2px] border border-line bg-surface-0 p-3">

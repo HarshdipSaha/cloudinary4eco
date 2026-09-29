@@ -55,6 +55,34 @@ export async function activeClaim(db: Db, projectId: string, siteId: string | nu
   return rows.find((c) => c.siteId === siteId) ?? rows.find((c) => c.siteId === null) ?? null;
 }
 
+export async function createPublicVideoImport(db: Db, row: typeof t.publicVideoImports.$inferInsert) {
+  const [created] = await db.insert(t.publicVideoImports).values(row).returning();
+  return created!;
+}
+
+export async function publicVideoImport(db: Db, id: string) {
+  return (await db.select().from(t.publicVideoImports).where(eq(t.publicVideoImports.id, id)))[0] ?? null;
+}
+
+export async function publicVideoFrames(db: Db, importId: string) {
+  return db.select().from(t.evidence).where(eq(t.evidence.videoImportId, importId)).orderBy(t.evidence.frameSecond);
+}
+
+export async function attachVideoFrame(db: Db, assetId: string, importId: string, frameSecond: number) {
+  await db.update(t.evidence).set({ videoImportId: importId, frameSecond }).where(eq(t.evidence.assetId, assetId));
+}
+
+export async function updatePublicVideoImport(db: Db, id: string, values: { status: string; statusReason?: string | null }) {
+  await db.update(t.publicVideoImports).set(values).where(eq(t.publicVideoImports.id, id));
+}
+
+/** Deletes ledger rows for one import after its media resources have been cleaned up. */
+export async function deletePublicVideoImportRows(db: Db, importId: string) {
+  const frames = await publicVideoFrames(db, importId);
+  for (const frame of frames) await deleteEvidence(db, frame.assetId);
+  await db.delete(t.publicVideoImports).where(eq(t.publicVideoImports.id, importId));
+}
+
 export async function recordDecision(db: Db, d: Decision) {
   const stateHash = d.state === undefined ? null : createHash("sha256").update(JSON.stringify(d.state)).digest("hex");
   const [row] = await db.insert(t.decisions).values({
