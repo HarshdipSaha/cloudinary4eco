@@ -26,6 +26,7 @@ export function analysis(assetId: string, over: Partial<MediaAnalysis> = {}): Me
 export class FakeMedia implements MediaPort {
   contexts: Record<string, Record<string, string>> = {};
   searchResult: string[] = [];
+  destroyed: string[] = [];
   constructor(public analyses: Record<string, MediaAnalysis> = {}) {}
   add(a: MediaAnalysis) {
     this.analyses[a.assetId] = a;
@@ -41,6 +42,9 @@ export class FakeMedia implements MediaPort {
   }
   async setContext(id: string, ctx: Record<string, string>) {
     this.contexts[id] = { ...this.contexts[id], ...ctx };
+  }
+  async destroy(id: string) {
+    this.destroyed.push(id);
   }
   async searchIds() {
     return this.searchResult;

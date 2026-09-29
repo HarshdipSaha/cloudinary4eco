@@ -50,3 +50,19 @@ export async function POST(req: Request, props: { params: Promise<{ assetId: str
   }
 }
 
+export async function DELETE(_req: Request, props: { params: Promise<{ assetId: string[] }> }) {
+  try {
+    const assetId = (await props.params).assetId.join("/");
+    const d = await deps();
+    const { assetIds } = await repo.mediaAssetsForEvidenceDeletion(d.db, assetId);
+
+    // Delete Cloudinary resources first. If that fails, the ledger entry remains available.
+    await Promise.all(assetIds.map((id) => d.media.destroy(id)));
+    await repo.deleteEvidence(d.db, assetId);
+
+    return NextResponse.json({ ok: true, assetId });
+  } catch (err) {
+    const message = (err as Error).message;
+    return NextResponse.json({ error: message }, { status: message === "Evidence not found" ? 404 : 400 });
+  }
+}

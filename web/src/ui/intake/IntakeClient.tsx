@@ -305,6 +305,10 @@ export function IntakeClient({
             )
           );
         }}
+        onDeleted={(assetId) => {
+          setRows((prev) => prev.filter((r) => r.assetId !== assetId));
+          setSelectedAssetId(null);
+        }}
       />
     </div>
   );

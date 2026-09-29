@@ -44,6 +44,13 @@ export function cloudinaryGateway(): MediaPort {
       await cloudinary.uploader.add_context(ctx, [assetId]);
     },
 
+    async destroy(assetId) {
+      const result = await cloudinary.uploader.destroy(assetId, { resource_type: "image", invalidate: true });
+      if (result.result !== "ok" && result.result !== "not found") {
+        throw new Error(`Cloudinary could not delete ${assetId}: ${result.result}`);
+      }
+    },
+
     async searchIds(expression, max) {
       const res = await cloudinary.search.expression(expression).max_results(max).execute();
       return (res.resources as { public_id: string }[]).map((r) => r.public_id);

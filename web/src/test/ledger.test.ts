@@ -35,4 +35,17 @@ describe("ledger repo", () => {
     expect(u.inputTokens).toBe(1000);
     expect(u.usd).toBeCloseTo(0.000042, 9);
   });
+  it("deletes evidence and clears it as the current baseline", async () => {
+    await repo.upsertEvidence(db, { assetId: "a1", projectId: "p1", siteId: "s1", source: "bulk_import", status: "accepted", secureUrl: "u", width: 1, height: 1, tags: [], missingSignals: [], flags: [] });
+    await repo.setBaseline(db, "s1", "a1");
+    await repo.recordDecision(db, { kind: "triage_relevance", subjectId: "a1", answer: "evidence", probabilities: {}, confidence: 0.9, model: "m", latencyMs: 1, inputTokens: 1 });
+
+    const assets = await repo.mediaAssetsForEvidenceDeletion(db, "a1");
+    await repo.deleteEvidence(db, "a1");
+
+    expect(assets.assetIds).toEqual(["a1"]);
+    expect(await repo.evidenceItem(db, "a1")).toBeNull();
+    expect((await repo.site(db, "s1"))?.baselineAssetId).toBeNull();
+    expect(await repo.decisionsFor(db, "a1")).toEqual([]);
+  });
 });

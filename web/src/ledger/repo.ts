@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 import type { Db } from "./db";
 import * as t from "./schema";
 import { INTEGRITY_FLAGS, type Decision, type DecisionKind, type ProjectType, type Site } from "@/domain/types";
@@ -120,6 +120,57 @@ export async function derivative(db: Db, id: number) {
 }
 export async function derivativeFor(db: Db, sourceAssetId: string) {
   return (await db.select().from(t.derivatives).where(eq(t.derivatives.sourceAssetId, sourceAssetId)).orderBy(desc(t.derivatives.createdAt)))[0] ?? null;
+}
+
+/**
+ * Lists the original and generated Cloudinary resources that belong to an evidence item.
+ * The caller destroys these before removing the ledger rows.
+ */
+export async function mediaAssetsForEvidenceDeletion(db: Db, assetId: string) {
+  const evidence = await evidenceItem(db, assetId);
+  if (!evidence) throw new Error("Evidence not found");
+  const derivatives = await db
+    .select()
+    .from(t.derivatives)
+    .where(or(eq(t.derivatives.sourceAssetId, assetId), eq(t.derivatives.baselineAssetId, assetId)));
+  return {
+    evidence,
+    assetIds: [...new Set([assetId, ...derivatives.flatMap((d) => [d.alignedAssetId, d.differenceAssetId]).filter((id): id is string => Boolean(id))])],
+  };
+}
+
+/** Removes an evidence item and all ledger rows that depend on it. */
+export async function deleteEvidence(db: Db, assetId: string) {
+  const evidence = await evidenceItem(db, assetId);
+  if (!evidence) throw new Error("Evidence not found");
+  const derivatives = await db
+    .select()
+    .from(t.derivatives)
+    .where(or(eq(t.derivatives.sourceAssetId, assetId), eq(t.derivatives.baselineAssetId, assetId)));
+  const derivativeIds = derivatives.map((d) => d.id);
+  const assessments = derivativeIds.length
+    ? await db.select().from(t.assessments).where(inArray(t.assessments.derivativeId, derivativeIds))
+    : [];
+  const decisionIds = assessments.flatMap((a) => (a.decisionId === null ? [] : [a.decisionId]));
+
+  await db.transaction(async (tx) => {
+    if (evidence.siteId) {
+      await tx.update(t.sites).set({ baselineAssetId: null }).where(and(eq(t.sites.id, evidence.siteId), eq(t.sites.baselineAssetId, assetId)));
+      await tx.delete(t.baselineHistory).where(eq(t.baselineHistory.assetId, assetId));
+    }
+    if (derivativeIds.length) {
+      await tx.delete(t.assessments).where(inArray(t.assessments.derivativeId, derivativeIds));
+      if (decisionIds.length) {
+        await tx.delete(t.reportSentences).where(inArray(t.reportSentences.decisionId, decisionIds));
+        await tx.delete(t.agreements).where(inArray(t.agreements.decisionId, decisionIds));
+        await tx.delete(t.decisions).where(inArray(t.decisions.id, decisionIds));
+      }
+      await tx.delete(t.derivatives).where(inArray(t.derivatives.id, derivativeIds));
+    }
+    await tx.delete(t.overrides).where(eq(t.overrides.subjectId, assetId));
+    await tx.delete(t.decisions).where(eq(t.decisions.subjectId, assetId));
+    await tx.delete(t.evidence).where(eq(t.evidence.assetId, assetId));
+  });
 }
 
 export async function insertAssessment(db: Db, a: typeof t.assessments.$inferInsert) {
@@ -323,7 +374,6 @@ export async function readingList(db: Db, projectId: string): Promise<ReadingLis
 
   return rows;
 }
-
 
 
 

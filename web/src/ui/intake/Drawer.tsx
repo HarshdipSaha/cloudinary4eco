@@ -9,7 +9,7 @@ import { ProbabilityBar } from "@/ui/ProbabilityBar";
 import { FlagMark, StatusMark } from "@/ui/marks";
 import type { EvidenceStatus, FlagKind } from "@/domain/types";
 import { Button } from "@/ui/Button";
-import { X, Check, Ban, MapPin } from "lucide-react";
+import { X, Check, Ban, MapPin, Trash2 } from "lucide-react";
 
 interface DecisionRecord {
   id: number;
@@ -29,12 +29,14 @@ export function Drawer({
   onClose,
   onSelectAsset,
   onReviewed,
+  onDeleted,
 }: {
   row: IntakeRow | null;
   isOpen: boolean;
   onClose: () => void;
   onSelectAsset: (assetId: string) => void;
   onReviewed: (assetId: string, action: string, siteId?: string, reason?: string) => void;
+  onDeleted: (assetId: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<{
@@ -120,6 +122,25 @@ export function Drawer({
       onReviewed(row.assetId, reviewMode, selectedSiteId, reviewReason);
       setReviewMode(null);
       setReviewReason("");
+      onClose();
+    } catch (err) {
+      setSubmitError((err as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!row?.assetId || !window.confirm(`Permanently delete “${row.name}”? This cannot be undone.`)) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch(`/api/review/${row.assetId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Delete failed");
+      }
+      onDeleted(row.assetId);
       onClose();
     } catch (err) {
       setSubmitError((err as Error).message);
@@ -375,6 +396,15 @@ export function Drawer({
                     >
                       <MapPin className="h-3.5 w-3.5" />
                       Assign site
+                    </Button>
+                    <Button
+                      variant="quiet"
+                      onClick={handleDelete}
+                      disabled={submitting}
+                      className="gap-1.5 text-flag hover:border-flag/60"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete photo
                     </Button>
                   </div>
                 ) : (
