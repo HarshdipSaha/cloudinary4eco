@@ -153,24 +153,24 @@ export async function deleteEvidence(db: Db, assetId: string) {
     : [];
   const decisionIds = assessments.flatMap((a) => (a.decisionId === null ? [] : [a.decisionId]));
 
-  await db.transaction(async (tx) => {
-    if (evidence.siteId) {
-      await tx.update(t.sites).set({ baselineAssetId: null }).where(and(eq(t.sites.id, evidence.siteId), eq(t.sites.baselineAssetId, assetId)));
-      await tx.delete(t.baselineHistory).where(eq(t.baselineHistory.assetId, assetId));
+  // Neon HTTP deliberately does not implement interactive transactions. Delete
+  // dependent rows first so this works in the same production driver as Vercel.
+  if (evidence.siteId) {
+    await db.update(t.sites).set({ baselineAssetId: null }).where(and(eq(t.sites.id, evidence.siteId), eq(t.sites.baselineAssetId, assetId)));
+    await db.delete(t.baselineHistory).where(eq(t.baselineHistory.assetId, assetId));
+  }
+  if (derivativeIds.length) {
+    await db.delete(t.assessments).where(inArray(t.assessments.derivativeId, derivativeIds));
+    if (decisionIds.length) {
+      await db.delete(t.reportSentences).where(inArray(t.reportSentences.decisionId, decisionIds));
+      await db.delete(t.agreements).where(inArray(t.agreements.decisionId, decisionIds));
+      await db.delete(t.decisions).where(inArray(t.decisions.id, decisionIds));
     }
-    if (derivativeIds.length) {
-      await tx.delete(t.assessments).where(inArray(t.assessments.derivativeId, derivativeIds));
-      if (decisionIds.length) {
-        await tx.delete(t.reportSentences).where(inArray(t.reportSentences.decisionId, decisionIds));
-        await tx.delete(t.agreements).where(inArray(t.agreements.decisionId, decisionIds));
-        await tx.delete(t.decisions).where(inArray(t.decisions.id, decisionIds));
-      }
-      await tx.delete(t.derivatives).where(inArray(t.derivatives.id, derivativeIds));
-    }
-    await tx.delete(t.overrides).where(eq(t.overrides.subjectId, assetId));
-    await tx.delete(t.decisions).where(eq(t.decisions.subjectId, assetId));
-    await tx.delete(t.evidence).where(eq(t.evidence.assetId, assetId));
-  });
+    await db.delete(t.derivatives).where(inArray(t.derivatives.id, derivativeIds));
+  }
+  await db.delete(t.overrides).where(eq(t.overrides.subjectId, assetId));
+  await db.delete(t.decisions).where(eq(t.decisions.subjectId, assetId));
+  await db.delete(t.evidence).where(eq(t.evidence.assetId, assetId));
 }
 
 export async function insertAssessment(db: Db, a: typeof t.assessments.$inferInsert) {
@@ -374,6 +374,5 @@ export async function readingList(db: Db, projectId: string): Promise<ReadingLis
 
   return rows;
 }
-
 
 
