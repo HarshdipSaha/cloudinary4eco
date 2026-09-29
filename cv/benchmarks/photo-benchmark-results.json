@@ -1,0 +1,38 @@
+{
+  "generated_at_utc": "2026-09-29T20:02:28.197234+00:00",
+  "python_version": "3.12.0",
+  "opencv_version": "4.10.0",
+  "numpy_version": "1.26.4",
+  "cases": [
+    {
+      "name": "same_scene_baseline_followup",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/followup.jpg",
+      "expected_quality": "good",
+      "quality": "good",
+      "expectation_met": true,
+      "inliers": 1764,
+      "inlier_ratio": 0.9955,
+      "elapsed_ms": 812.7,
+      "metrics": {
+        "visible_green_cover_before_percent": 32.98,
+        "visible_green_cover_after_percent": 47.77,
+        "visible_green_cover_delta_percentage_points": 14.79,
+        "aligned_area_changed_percent": 0.67,
+        "brightness_shift_lab_l": 16.06
+      }
+    },
+    {
+      "name": "unrelated_photo_negative_control",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/other_site.jpg",
+      "expected_quality": "failed",
+      "quality": "failed",
+      "expectation_met": true,
+      "inliers": 4,
+      "inlier_ratio": 0.3636,
+      "elapsed_ms": 754.2,
+      "metrics": null
+    }
+  ]
+}
