@@ -19,6 +19,20 @@ export default async function PublicSitePage(props: {
   if (!site) notFound();
 
   const chart = await repo.siteChart(db, site.id);
+  const timepointsWithMetrics = chart.timepoints.map((tp) => {
+    const metrics = tp.derivative?.metrics;
+    const before = metrics?.vegetationFractionBefore;
+    const after = metrics?.vegetationFractionAfter;
+    return {
+      ...tp,
+      visibleGreenCover: Number.isFinite(before) && Number.isFinite(after)
+        ? `${(before! * 100).toFixed(1)}% → ${(after! * 100).toFixed(1)}%`
+        : "—",
+      changedArea: metrics && Number.isFinite(metrics.changedAreaFraction)
+        ? `${(metrics.changedAreaFraction * 100).toFixed(1)}%`
+        : "—",
+    };
+  });
   const project = chart.project;
   const projectType = (project?.type ?? "plantation") as ProjectType;
   const rubric = SRC_RUBRICS[projectType] ?? SRC_RUBRICS.plantation;
@@ -158,13 +172,13 @@ export default async function PublicSitePage(props: {
               <tr>
                 <th className="p-3">Timepoint</th>
                 <th className="p-3">SRC Grade</th>
-                <th className="p-3">Green ExG Index</th>
-                <th className="p-3">Canopy Change</th>
+                <th className="p-3">Visible green cover (estimate)</th>
+                <th className="p-3">Aligned area changed</th>
                 <th className="p-3">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-paper-line">
-              {chart.timepoints.map((tp) => (
+              {timepointsWithMetrics.map((tp) => (
                 <tr key={tp.timepoint} id={`tp-${tp.timepoint}`} className="hover:bg-paper-surface/50">
                   <td className="p-3 font-mono font-medium">
                     <a href={`#tp-${tp.timepoint}`} className="hover:underline">
@@ -174,17 +188,8 @@ export default async function PublicSitePage(props: {
                   <td className="p-3 font-medium">
                     {tp.grade !== null ? `Grade ${tp.grade} (${rubric.labels[tp.grade] ?? "Level " + tp.grade})` : "—"}
                   </td>
-                  <td className="p-3 font-mono">
-                    {tp.derivative?.metrics?.exg_p90 !== undefined
-                      ? (tp.derivative.metrics.exg_p90 * 100).toFixed(1) + "%"
-                      : "—"}
-                  </td>
-                  <td className="p-3 font-mono">
-                    {tp.derivative?.metrics?.exg_diff_mean !== undefined
-                      ? (tp.derivative.metrics.exg_diff_mean > 0 ? "+" : "") +
-                        (tp.derivative.metrics.exg_diff_mean * 100).toFixed(1) + "%"
-                      : "—"}
-                  </td>
+                  <td className="p-3 font-mono">{tp.visibleGreenCover}</td>
+                  <td className="p-3 font-mono">{tp.changedArea}</td>
                   <td className="p-3 capitalize text-paper-ink-muted">
                     {tp.status.replace("_", " ")}
                   </td>
@@ -193,6 +198,9 @@ export default async function PublicSitePage(props: {
             </tbody>
           </table>
         </div>
+        <p className="text-[12px] text-paper-ink-muted">
+          Green cover is the estimated share of visible pixels classified as green inside the aligned photo area. Lighting, season, and occlusion can affect it; it is not a biomass measurement.
+        </p>
       </section>
 
       {/* Share / Social Downloads */}
