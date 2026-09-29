@@ -305,6 +305,20 @@ export function IntakeClient({
             )
           );
         }}
+        onRetried={(assetId, result) => {
+          setRows((prev) =>
+            prev.map((r) =>
+              r.assetId === assetId
+                ? {
+                    ...r,
+                    status: result.status,
+                    statusReason: result.statusReason,
+                    state: result.status === "pending" ? "pending" : "decided",
+                  }
+                : r
+            )
+          );
+        }}
         onDeleted={(assetId) => {
           setRows((prev) => prev.filter((r) => r.assetId !== assetId));
           setSelectedAssetId(null);

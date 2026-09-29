@@ -341,6 +341,9 @@ export function SearchClient({
         onReviewed={() => {
           performSearch();
         }}
+        onRetried={() => {
+          performSearch();
+        }}
         onDeleted={() => {
           performSearch();
         }}
