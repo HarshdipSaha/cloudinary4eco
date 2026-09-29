@@ -23,13 +23,14 @@ export default async function PublicSitePage(props: {
     const metrics = tp.derivative?.metrics;
     const before = metrics?.vegetationFractionBefore;
     const after = metrics?.vegetationFractionAfter;
+    const changedAreaFraction = metrics?.changedAreaFraction;
     return {
       ...tp,
       visibleGreenCover: Number.isFinite(before) && Number.isFinite(after)
         ? `${(before! * 100).toFixed(1)}% → ${(after! * 100).toFixed(1)}%`
         : "—",
-      changedArea: metrics && Number.isFinite(metrics.changedAreaFraction)
-        ? `${(metrics.changedAreaFraction * 100).toFixed(1)}%`
+      changedArea: typeof changedAreaFraction === "number" && Number.isFinite(changedAreaFraction)
+        ? `${(changedAreaFraction * 100).toFixed(1)}%`
         : "—",
     };
   });
