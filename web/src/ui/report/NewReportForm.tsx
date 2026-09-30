@@ -9,10 +9,12 @@ export function NewReportForm({
   projectId,
   defaultStart,
   defaultEnd,
+  includeSeededControl = false,
 }: {
   projectId: string;
   defaultStart: string;
   defaultEnd: string;
+  includeSeededControl?: boolean;
 }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +39,7 @@ export function NewReportForm({
           projectId,
           periodStart,
           periodEnd,
+          ...(includeSeededControl ? { includeSeededControl: true } : {}),
         }),
       });
 
@@ -70,7 +73,7 @@ export function NewReportForm({
           className="rounded-[2px] border border-line bg-surface-1 p-4 space-y-4 max-w-lg"
         >
           <div className="flex items-center justify-between border-b border-line pb-2">
-            <h3 className="text-sm font-semibold text-text">Generate New Report</h3>
+            <h3 className="text-sm font-semibold text-text">{includeSeededControl ? "Generate judge walkthrough report" : "Generate New Report"}</h3>
             <button
               type="button"
               onClick={() => {
@@ -82,6 +85,12 @@ export function NewReportForm({
               Cancel
             </button>
           </div>
+
+          {includeSeededControl && (
+            <p className="border border-attention/40 bg-surface-0 p-2.5 text-[11px] text-text-2">
+              This report uses the normal composer and Jev checks. It adds one clearly labeled, uncited test control so the report flow can show the existing no-receipt struck state; it is not a field claim.
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>

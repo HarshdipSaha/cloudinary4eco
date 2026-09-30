@@ -69,6 +69,7 @@ export function ReportSheet({
     : sentences;
 
   const struckCount = sentences.filter((s) => s.status === "struck").length;
+  const pendingCount = sentences.filter((s) => s.status === "pending").length;
 
   function copyPublicLink() {
     const url = `${window.location.origin}/r/${report.publicSlug}`;
@@ -150,7 +151,7 @@ export function ReportSheet({
           </div>
 
           <div className="mt-2 text-[11px] text-paper-ink-muted font-mono">
-            Models: Drafter (Groq, prose only) · Fact Verifier (TypeSafe Jev calibrated)
+            Models: Drafter (Groq, prose only) · Sentence checker (TypeSafe Jev)
           </div>
         </header>
 
@@ -276,13 +277,15 @@ export function ReportSheet({
         {/* Footer Audit Statement */}
         <footer className="mt-12 border-t border-paper-line pt-6 text-[13px] text-paper-ink-muted space-y-1">
           <p>
-            Every sentence above links to its evidence.{" "}
+            Report sentences are checked against their cited ledger facts.{" "}
             {struckCount > 0
               ? `${struckCount} drafted sentence${struckCount > 1 ? "s were" : " was"} withheld because the evidence did not support them.`
-              : "All drafted claims were verified and supported by photographic ledger evidence."}
+              : pendingCount > 0
+              ? `${pendingCount} sentence${pendingCount > 1 ? "s are" : " is"} still pending; pending sentences are not shown on the public report page.`
+              : "All checked sentences were supported by their cited ledger facts."}
           </p>
           <p className="font-mono text-[11px]">
-            Methodology: Sentence support verified using atomic fact attribution (Rashkin AIS / FActScore principles) via TypeSafe Jev discrete calibrated decisions.
+            Sentence support is evaluated against the text of cited ledger facts using TypeSafe Jev.
           </p>
         </footer>
       </div>

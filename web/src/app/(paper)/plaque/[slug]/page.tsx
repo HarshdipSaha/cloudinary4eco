@@ -77,8 +77,8 @@ export default async function PlaquePrintPage(props: {
 
         {/* Bottom Note */}
         <div className="border-t border-paper-line pt-4 text-center font-mono text-[10px] text-paper-ink-muted space-y-1">
-          <div>Faces and personal identities are blurred before publication.</div>
-          <div>Photographic evidence is verified using deterministic computer vision and TypeSafe Jev.</div>
+          <div>Selected public image views use face pixelation; it may not apply to every route.</div>
+          <div>Submitted evidence may be pending while computer vision or Jev decisions run.</div>
         </div>
       </div>
     </div>

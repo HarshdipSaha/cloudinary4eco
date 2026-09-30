@@ -9,6 +9,7 @@ const Body = z.object({
   projectId: z.string().min(1),
   periodStart: z.string().min(1),
   periodEnd: z.string().min(1),
+  includeSeededControl: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
       projectId: body.projectId,
       periodStart: body.periodStart,
       periodEnd: body.periodEnd,
+      includeSeededControl: body.includeSeededControl,
     });
 
     return NextResponse.json({ reportId });

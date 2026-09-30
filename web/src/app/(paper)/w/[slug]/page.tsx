@@ -7,8 +7,9 @@ export const dynamic = "force-dynamic";
 
 export default async function WitnessCapturePage(props: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ sample?: string }>;
 }) {
-  const { slug } = await props.params;
+  const [{ slug }, query] = await Promise.all([props.params, props.searchParams]);
   const db = await getDb();
   const site = await repo.siteBySlug(db, slug);
   if (!site) notFound();
@@ -25,6 +26,7 @@ export default async function WitnessCapturePage(props: {
         baselineAssetId: site.baselineAssetId,
       }}
       gradeLabel={latest?.grade ? `Grade ${latest.grade}` : undefined}
+      seededSampleUrl={query.sample === "seeded-followup" ? "/judge/samples/plot-b-followup.jpg" : undefined}
     />
   );
 }

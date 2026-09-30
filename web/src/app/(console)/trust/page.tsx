@@ -37,7 +37,7 @@ const KIND_META: Record<string, { title: string; desc: string }> = {
   },
   grade_src: {
     title: "SRC Ecological Grade",
-    desc: "Classifies stage of ecological recovery based on ground cover and sapling survival.",
+    desc: "Jev scores the site response using available captions and CV measurements against the project rubric.",
   },
 };
 
@@ -53,8 +53,6 @@ export default async function TrustPage() {
     }
   }
 
-  const modelName = process.env.TYPESAFE_DEFAULT_MODEL ?? "jev-1.13.0";
-
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-surface-0">
       {/* Top Header */}
@@ -69,7 +67,7 @@ export default async function TrustPage() {
               Trust & Reliability Center
             </h1>
             <p className="mt-1 text-[13px] text-text-2">
-              Empirical calibration audit: every probability emitted by TypeSafe Jev is backed by held-out verification.
+              This page shows the latest saved evaluation artifact when one is available. Its results may not cover every live decision or deployment.
             </p>
           </div>
           <div className="rounded-[2px] border border-line bg-surface-0 p-3">
@@ -92,10 +90,10 @@ export default async function TrustPage() {
               <div className="rounded-[2px] border border-line bg-surface-1 p-4 space-y-4">
                 <div>
                   <span className="font-mono text-[11px] text-text-3 uppercase tracking-wider block">
-                    Pinned Decision Model
+                    Model in evaluation artifact
                   </span>
                   <span className="font-mono text-base font-semibold text-text">
-                    {calibration.model || modelName}
+                    {calibration.model || "Not recorded"}
                   </span>
                 </div>
 
@@ -131,7 +129,7 @@ export default async function TrustPage() {
                   <span>Small-Sample ECE Notice</span>
                 </div>
                 <p className="text-text-3 leading-relaxed">
-                  Per statistical calibration literature, Expected Calibration Error (ECE) is subject to bin-estimation variance when N &lt; 1000. SAAKSHYA presents the strictly proper Brier score alongside ECE as the ground truth calibration metric.
+                  ECE depends on binning and sample size. The Brier score complements ECE; neither is ground truth. These results describe only the labeled evaluation corpus shown here.
                 </p>
               </div>
             </div>
@@ -141,7 +139,7 @@ export default async function TrustPage() {
               {Object.entries(calibration.kinds).map(([kindKey, kData]) => {
                 const meta = KIND_META[kindKey] ?? {
                   title: kindKey.replace("_", " "),
-                  desc: "Discrete calibrated decision category.",
+                  desc: "Discrete rubric category returned by Jev.",
                 };
                 const pctAcc = (kData.accuracy * 100).toFixed(1);
                 const pctCov = (kData.coverage * 100).toFixed(0);

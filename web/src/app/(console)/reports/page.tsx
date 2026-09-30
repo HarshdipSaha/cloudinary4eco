@@ -7,11 +7,18 @@ import { FileText, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function ReportsIndexPage() {
+export default async function ReportsIndexPage(props: {
+  searchParams: Promise<{ judge?: string; periodStart?: string; periodEnd?: string; projectId?: string }>;
+}) {
+  const query = await props.searchParams;
   const db = await getDb();
   const projects = await repo.listProjects(db);
-  const projectId = projects[0]?.id ?? "yamuna-green";
+  const projectId = projects.some((p) => p.id === query.projectId)
+    ? query.projectId!
+    : projects[0]?.id ?? "yamuna-green";
   const project = await repo.project(db, projectId);
+  const today = new Date().toISOString().slice(0, 10);
+  const currentMonthStart = `${today.slice(0, 7)}-01`;
 
   const rawReports = await repo.reportsForProject(db, projectId);
 
@@ -45,14 +52,15 @@ export default async function ReportsIndexPage() {
               Attributable Reports
             </h1>
             <p className="mt-1 text-[13px] text-text-2">
-              Every drafted statement is verified against ledger receipts. Unattributable claims are automatically withheld.
+              Sentences are checked against cited ledger facts. Unsupported sentences are struck; unavailable checks stay pending.
             </p>
           </div>
 
           <NewReportForm
             projectId={projectId}
-            defaultStart="2026-09-01"
-            defaultEnd="2026-09-30"
+            defaultStart={query.periodStart ?? currentMonthStart}
+            defaultEnd={query.periodEnd ?? today}
+            includeSeededControl={query.judge === "1"}
           />
         </div>
       </div>

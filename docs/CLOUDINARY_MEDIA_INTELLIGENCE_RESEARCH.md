@@ -1,7 +1,9 @@
-# Cloudinary Media Intelligence & AI Capabilities: Definitive Technical Reference
+# Research notes: Cloudinary media intelligence and AI capabilities
 **Project:** AI-Powered Impact & Sustainability Media Platform (Problem Statement 02 - Cloudinary)  
 **Date:** September 2026  
 **Audience:** Full-Stack Engineers, AI Architects, M&E Specialists, and Hackathon Judges
+
+> **Research proposal, not an implementation guide.** This document discusses media capabilities and possible designs; it does not describe features shipped in SAAKSHYA. For current account and code behavior, use the [verified Cloudinary integration guide](CLOUDINARY.md) and [current specification](SPECIFICATION_DOCUMENT.md).
 
 ---
 

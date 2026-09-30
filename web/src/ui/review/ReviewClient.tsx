@@ -397,10 +397,10 @@ export function ReviewClient({
                 )}
               </div>
 
-              {/* Calibrated Decisions */}
+              {/* Decision records */}
               <div className="rounded-[2px] border border-line bg-surface-1 p-3 space-y-2">
                 <div className="mono text-[11px] font-semibold text-text-3 uppercase tracking-wider">
-                  Calibrated Decisions
+                  Jev decision records
                 </div>
                 {evidenceDetail?.decisions && evidenceDetail.decisions.length > 0 ? (
                   evidenceDetail.decisions.map((d: any) => (

@@ -4,6 +4,8 @@ Verifiable impact tracking for NGOs, CSR teams, and civic bodies.
 
 **Live:** [saakshya-web.vercel.app](https://saakshya-web.vercel.app)
 
+**Judge walkthrough:** [Open the upload-first evidence journey](https://saakshya-web.vercel.app/judge) · [Read the reproducible script](docs/DEMO_SCRIPT.md)
+
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/07b68a33-2e87-4e0c-8c41-607d4385dbff" />
 
 ## Documentation
@@ -44,7 +46,7 @@ Cloudinary handles signed image uploads, media storage, selected metadata, URL t
 | Public video evidence | Imports a permitted public Cloudinary video URL and extracts three still frames for normal evidence ingestion. |
 | Structured search | Executes Cloudinary search expressions to retrieve asset IDs; the adapter supports filters, not free-text semantic search. |
 
-The saved account probe reports Cloudinary captioning, Google/AWS auto-tagging, Cloudinary AI tagging, and advanced OCR as unavailable for the current account. C2PA signing, Cloudinary difference analysis, video splicing/reframing, and "zero local image processing" are not current capabilities. See the [verified integration guide](docs/CLOUDINARY.md) for details and code references.
+The checked-in account probe records Cloudinary captioning, Google/AWS auto-tagging, Cloudinary AI tagging, and advanced OCR as unavailable at probe time; recheck before describing these add-ons as enabled. C2PA signing, Cloudinary difference analysis, video splicing/reframing, and "zero local image processing" are not current capabilities. See the [verified integration guide](docs/CLOUDINARY.md) for details and code references.
 
 ## Stack
 
@@ -61,14 +63,17 @@ The saved account probe reports Cloudinary captioning, Google/AWS auto-tagging, 
 
 The app includes evidence intake and review, site evidence and registration views, public witness submission, evidence search, trust information, and report composition. External service availability affects which decisions can complete; unavailable decisions are recorded as pending rather than fabricated.
 
+The [judge walkthrough](https://saakshya-web.vercel.app/judge) links the upload, comparison, stored decision receipt, witness submission, and report flows. Its downloadable images are seeded repository fixtures, not field evidence. Service-dependent steps show pending when a required service or record is unavailable.
+
 ## Running Locally
 
 ```bash
 cd web
 cp .env.example .env
-# Fill in CLOUDINARY_*, DATABASE_URL, GROQ_API_KEY
+# Set the Cloudinary, Jev, Groq, and CV worker values in .env.
+# For a disposable local ledger, clear DATABASE_URL to use local PGlite.
 npm install
-npm run db:push
+npm run seed
 npm run dev
 ```
 
@@ -77,7 +82,7 @@ CV worker (needed for image registration and change metrics):
 ```bash
 cd cv
 pip install -e .
-uvicorn app.main:app --reload
+uvicorn app.main:app --port 8001 --reload
 ```
 
 ## Project Principles

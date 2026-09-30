@@ -11,12 +11,16 @@ type TabKey = "all" | "accepted" | "needs_review" | "set_aside" | "pending";
 
 export function IntakeClient({
   projectId,
+  siteId,
+  deepLinkAssetId,
   initialRows = [],
 }: {
   projectId: string;
+  siteId?: string;
+  deepLinkAssetId?: string;
   initialRows?: IntakeRow[];
 }) {
-  const { rows, totals, isProcessing, handleFiles, setRows } = useIntake(projectId);
+  const { rows, totals, isProcessing, handleFiles, setRows } = useIntake(projectId, siteId);
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
@@ -25,6 +29,7 @@ export function IntakeClient({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dirInputRef = useRef<HTMLInputElement>(null);
+  const deepLinkHandledRef = useRef<string | null>(null);
 
   // Initialize with initial rows if any
   useEffect(() => {
@@ -32,6 +37,17 @@ export function IntakeClient({
       setRows(initialRows);
     }
   }, [initialRows]);
+
+  useEffect(() => {
+    if (!deepLinkAssetId || deepLinkHandledRef.current === deepLinkAssetId) return;
+    const index = rows.findIndex((r) => r.assetId === deepLinkAssetId || r.localId === deepLinkAssetId);
+    if (index < 0) return;
+    deepLinkHandledRef.current = deepLinkAssetId;
+    setActiveTab("all");
+    setSelectedIndex(index);
+    setSelectedAssetId(deepLinkAssetId);
+    setIsDrawerOpen(true);
+  }, [deepLinkAssetId, rows]);
 
   // Combine rows and filter by tab
   const filteredRows = useMemo(() => {
@@ -242,8 +258,8 @@ export function IntakeClient({
               Drop photos, a folder, or a WhatsApp chat export (.zip)
             </h3>
             <p className="mt-1 max-w-sm text-[13px] text-text-2">
-              SAAKSHYA automatically unpacks images, extracts timestamps and senders from
-              chat metadata, runs Cloudinary perception, and triages sites with TypeSafe Jev.
+              SAAKSHYA unpacks supported photo archives, uses matching chat timestamps when
+              available, reads available Cloudinary metadata, and triages evidence with Jev.
             </p>
             <div className="mt-6 flex gap-3">
               <Button variant="primary">
