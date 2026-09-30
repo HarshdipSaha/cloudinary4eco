@@ -65,3 +65,13 @@ export function pickThreshold(xs: Scored[], target: number) {
   }
   return { threshold: 1, coverage: 0, accuracy: 0 };
 }
+
+/** 95% Wilson score interval for an observed proportion; honest about small samples, unlike p ± 0 at 100%. */
+export function wilsonInterval(p: number, n: number) {
+  if (n <= 0) return { low: 0, high: 1 };
+  const z = 1.96;
+  const z2 = z * z;
+  const centre = (p + z2 / (2 * n)) / (1 + z2 / n);
+  const margin = (z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n))) / (1 + z2 / n);
+  return { low: Math.max(0, centre - margin), high: Math.min(1, centre + margin) };
+}
