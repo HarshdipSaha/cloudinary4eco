@@ -45,14 +45,14 @@ export function VideoRubric(props: {
   const router = useRouter();
   const video = useRef<HTMLVideoElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(props.durationSeconds);
+  // Frames were sampled on the recorded duration, so markers use it rather than the element's metadata.
+  const duration = props.durationSeconds;
   const [playable, setPlayable] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const active = activeObservation(props.observations, currentTime);
-  const canCampaign =
-    props.status === "complete" && props.observations.some((o) => o.status === "accepted" && o.relevance === "evidence");
+  const canCampaign = props.status === "complete" && props.observations.some((o) => o.status === "accepted");
   const caption = useMemo(
     () => (props.campaign?.sentences ?? []).filter((s) => s.status === "kept").map((s) => s.text).join(" "),
     [props.campaign]
@@ -106,7 +106,6 @@ export function VideoRubric(props: {
               preload="metadata"
               className="w-full rounded-[2px] border border-line bg-black"
               onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-              onLoadedMetadata={(e) => Number.isFinite(e.currentTarget.duration) && setDuration(e.currentTarget.duration)}
               onError={() => setPlayable(false)}
             />
           ) : (
@@ -185,7 +184,7 @@ export function VideoRubric(props: {
         </div>
         {!canCampaign && (
           <p className="text-[12px] text-text-3">
-            Accept at least one frame classified as field evidence in Review. Campaign cards use only human-accepted evidence.
+            Accept at least one frame in Review. Campaign cards use only frames a reviewer accepted; Jev's relevance call on a frame is shown but does not decide.
           </p>
         )}
         {error && <p className="text-[12px] text-flag">{error}</p>}

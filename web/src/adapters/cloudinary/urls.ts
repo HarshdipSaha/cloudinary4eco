@@ -16,7 +16,8 @@ export function urls(cloudName: string = process.env.NEXT_PUBLIC_CLOUDINARY_CLOU
     ].join("/");
 
   return {
-    video: (id: string) => `${videoBase}/f_auto,q_auto/${id}`,
+    /** Original format: transformed video is transcoded on first request and arrives partial. */
+    video: (id: string) => `${videoBase}/${id}`,
     /** One share-ready image: 1–3 evidence frames side by side, timestamped, with a disclosure band. */
     campaignCard: (x: { frames: { assetId: string; label: string }[]; footer: string }) => {
       if (x.frames.length < 1 || x.frames.length > 3) throw new Error("A campaign card needs one to three frames.");

@@ -33,9 +33,10 @@ describe("cloudinary urls", () => {
 describe("video delivery and campaign card", () => {
   const u = urls("demo");
 
-  it("delivers an imported video with automatic format and quality", () => {
+  it("delivers an imported video in its original format, untranscoded", () => {
+    // f_auto/q_auto make Cloudinary transcode on first request and serve a growing, partial file meanwhile.
     expect(u.video("saakshya/p1/public-video/pvi_1/abc")).toBe(
-      "https://res.cloudinary.com/demo/video/upload/f_auto,q_auto/saakshya/p1/public-video/pvi_1/abc"
+      "https://res.cloudinary.com/demo/video/upload/saakshya/p1/public-video/pvi_1/abc"
     );
   });
 

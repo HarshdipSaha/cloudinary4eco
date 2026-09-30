@@ -20,8 +20,11 @@ const words = (s: string) => s.replaceAll("_", " ");
 const at = (f: CampaignFrame) => formatTimestamp(f.frameSecond ?? 0);
 const list = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
 
-/** A campaign may only show frames a human accepted and Jev classed as field evidence. */
-export const isUsableFrame = (f: CampaignFrame) => f.status === "accepted" && f.relevance === "evidence";
+/**
+ * A campaign may only show frames a reviewer accepted. Jev sees text, not pixels, and a video frame carries no
+ * caption, tags or OCR, so its relevance call on a frame is advisory; the reviewer's acceptance is the gate.
+ */
+export const isUsableFrame = (f: CampaignFrame) => f.status === "accepted";
 
 export function videoFacts(input: { siteName: string; durationSeconds: number; frames: CampaignFrame[] }): Fact[] {
   const all = input.frames.map((f) => f.assetId);
@@ -33,10 +36,10 @@ export function videoFacts(input: { siteName: string; durationSeconds: number; f
     ...input.frames.map((f) => {
       const what =
         f.relevance === "evidence"
-          ? `was classified as field evidence showing ${words(f.activity ?? "unclassified activity")}`
+          ? `was classified by Jev as field evidence showing ${words(f.activity ?? "unclassified activity")}`
           : f.relevance
-            ? `was classified as ${words(f.relevance)}, not field evidence`
-            : "has no relevance decision yet";
+            ? `was classified by Jev as ${words(f.relevance)}, not field evidence`
+            : "has no relevance decision from Jev yet";
       return { text: `The frame at ${at(f)} ${what}; its review status is ${words(f.status)}.`, evidenceIds: [f.assetId] };
     }),
     { text: "Capture time and GPS location of the video are not verified.", evidenceIds: all },
@@ -48,14 +51,13 @@ export function videoFacts(input: { siteName: string; durationSeconds: number; f
 export function campaignDraft(facts: Fact[], frames: CampaignFrame[], siteName: string) {
   const frameFact = (i: number) => facts[i + 1]!.id;
   const usable = frames.map((f, i) => ({ f, i })).filter(({ f }) => isUsableFrame(f));
-  const activities = [...new Set(usable.map(({ f }) => words(f.activity ?? "field work")))];
   return [
     {
-      text: `Footage from ${siteName} shows ${list(activities)} at ${list(usable.map(({ f }) => at(f)))}.`,
+      text: `Footage from ${siteName} includes ${usable.length} reviewer-accepted frame${usable.length === 1 ? "" : "s"} at ${list(usable.map(({ f }) => at(f)))}.`,
       factIds: usable.map(({ i }) => frameFact(i)),
     },
     {
-      text: `${usable.length} of ${frames.length} sampled frames were accepted as field evidence.`,
+      text: `${usable.length} of ${frames.length} sampled frames were accepted by a reviewer.`,
       factIds: [facts[0]!.id, ...frames.map((_, i) => frameFact(i))],
     },
     { text: "The video's date and location are not independently verified.", factIds: [facts.at(-1)!.id] },
@@ -70,7 +72,7 @@ export async function composeVideoCampaign(deps: Pick<PipelineDeps, "db" | "deci
 
   const frames: CampaignFrame[] = rubric.observations.map(({ frame }) => frame);
   const usable = frames.filter(isUsableFrame);
-  if (!usable.length) throw new Error("Accept at least one frame as field evidence before generating a campaign card.");
+  if (!usable.length) throw new Error("Accept at least one frame in Review before generating a campaign card.");
 
   const siteName = rubric.site?.name ?? "the site";
   const facts = videoFacts({ siteName, durationSeconds: rubric.import.durationSeconds, frames });

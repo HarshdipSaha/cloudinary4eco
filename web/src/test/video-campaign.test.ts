@@ -21,36 +21,38 @@ describe("videoFacts", () => {
   it("states the sampling, each frame, and the verification gap as numbered facts", () => {
     const facts = videoFacts({ siteName: "Plot B", durationSeconds: 100, frames: rows });
     expect(facts.map((f) => f.id)).toEqual(["F1", "F2", "F3", "F4"]);
-    expect(facts[1]!.text).toBe("The frame at 0:10.0 was classified as field evidence showing planting; its review status is accepted.");
-    expect(facts[2]!.text).toMatch(/0:50\.0 was classified as people only, not field evidence/);
+    expect(facts[1]!.text).toBe("The frame at 0:10.0 was classified by Jev as field evidence showing planting; its review status is accepted.");
+    expect(facts[2]!.text).toMatch(/0:50\.0 was classified by Jev as people only, not field evidence/);
     expect(facts[3]!.text).toBe("Capture time and GPS location of the video are not verified.");
   });
   it("drafts sentences that cite only existing facts", () => {
     const facts = videoFacts({ siteName: "Plot B", durationSeconds: 100, frames: rows });
     const draft = campaignDraft(facts, rows, "Plot B");
     const ids = new Set(facts.map((f) => f.id));
-    expect(draft[0]!.text).toBe("Footage from Plot B shows planting at 0:10.0.");
-    expect(draft[1]!.text).toBe("1 of 2 sampled frames were accepted as field evidence.");
+    expect(draft[0]!.text).toBe("Footage from Plot B includes 1 reviewer-accepted frame at 0:10.0.");
+    expect(draft[1]!.text).toBe("1 of 2 sampled frames were accepted by a reviewer.");
     expect(draft.every((s) => s.factIds.length && s.factIds.every((f) => ids.has(f)))).toBe(true);
   });
-  it("only accepted evidence frames are usable", () => {
+  it("a reviewer's acceptance, not Jev's text-only relevance call, decides which frames are usable", () => {
     expect(rows.map(isUsableFrame)).toEqual([true, false]);
+    expect(isUsableFrame({ assetId: "c", frameSecond: 5, status: "accepted", relevance: "screenshot_or_meme", activity: "other" })).toBe(true);
   });
 });
 
 describe("composeVideoCampaign", () => {
-  it("refuses until a human has accepted an evidence frame", async () => {
-    await expect(composeVideoCampaign(w.deps, "pvi_test")).rejects.toThrow(/Accept at least one/);
+  it("refuses until a reviewer has accepted a frame", async () => {
+    await expect(composeVideoCampaign(w.deps, "pvi_test")).rejects.toThrow(/Accept at least one frame in Review/);
   });
 
-  it("builds a card from accepted evidence frames and keeps Jev-supported sentences", async () => {
+  it("builds a card from reviewer-accepted frames and keeps Jev-supported sentences", async () => {
     await accept("pvi_test/frame-10");
-    await accept("pvi_test/frame-90"); // accepted but people_only: must not appear on the card
-    w.decisions.supports = (s) => !s.startsWith("1 of");
+    await accept("pvi_test/frame-90"); // Jev said people_only, but a reviewer accepted it: the human call wins
+    await w.db.update(t.evidence).set({ status: "needs_review" }).where(eq(t.evidence.assetId, "pvi_test/frame-50"));
+    w.decisions.supports = (s) => !s.startsWith("2 of");
     const id = await composeVideoCampaign(w.deps, "pvi_test");
     const campaign = await repo.latestVideoCampaign(w.db, "pvi_test");
     expect(campaign?.id).toBe(id);
-    expect(campaign?.frameAssetIds).toEqual(["pvi_test/frame-10"]);
+    expect(campaign?.frameAssetIds).toEqual(["pvi_test/frame-10", "pvi_test/frame-90"]);
     expect(campaign?.imageUrl.endsWith("/pvi_test/frame-10")).toBe(true);
     expect(campaign?.sentences.map((s) => s.status)).toEqual(["kept", "struck", "kept"]);
     expect(campaign?.sentences[1]!.reason).toMatch(/Not supported/);
