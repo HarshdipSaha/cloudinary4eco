@@ -1,8 +1,9 @@
 # Specification: SAAKSHYA — Every Site Gets a Chart, Every Claim Needs a Witness
 
 **Hackathon:** Code Cubicle 6.0 · Problem Statement 02 (Cloudinary) · Online 3 Oct · Offline 11 Oct
-**Stack:** Cloudinary (perception, transformation, delivery, search) + Jev by TypeSafe AI (every typed decision) + one generative LLM (drafting prose only)
-**Replaces:** EcoProof AI (previous spec in git history at `22ab193`)
+**Current stack:** Next.js + TypeScript; Cloudinary for signed media upload, available metadata, transformations, and structured search; a Python/OpenCV worker for registration and change metrics; Jev for typed decisions; Groq-backed prose drafting; PostgreSQL-compatible evidence ledger.
+
+**Status:** This document contains both an as-built description and an aspirational requirements backlog. Only the capabilities listed in "Current implementation" are claims about the current application. Stories below are product requirements and are not evidence that a feature has shipped.
 
 ---
 
@@ -13,31 +14,26 @@ An NGO, CSR team or municipal body running physical projects (plantations, lake 
 That causes three concrete failures:
 
 1. **Nobody can prove change.** A "before" photo from January and an "after" photo from September are taken from different spots, zooms and angles. Putting them side by side proves nothing. The problem statement asks us to "compare before-and-after media to demonstrate visible change", and today's tooling can't do that honestly.
-2. **The only witness is the party being judged.** All evidence comes from the implementer claiming success. Donors, auditors and the community the project serves have no independent channel, so recycled photos, wrong-site photos and staged photos go unnoticed. (This is the same failure SAAKSHI addressed for public spending: the most common fraud is not a faked image but the *same real image reused* across claims.)
+2. **The only witness is the party being judged.** When evidence comes only from the implementer claiming success, donors, auditors, and the community have no independent channel to flag recycled photos, wrong-site photos, or staged photos.
 3. **Reports aren't traceable.** The quarterly donor report is hand-written prose. Its claims can't be traced to a specific photo, date or measurement, and nothing stops an LLM-written report from inventing progress.
 
-## Solution
+## Current implementation
 
-SAAKSHYA treats each project site the way a longitudinal imaging study treats a patient:
+The current application supports browser-to-Cloudinary signed image uploads; extraction of available metadata, pHash, face count, and tags; evidence ingestion and integrity checks; Python/OpenCV registration and change metrics; typed Jev decisions; public witness submissions; structured evidence search; and reports whose sentences are recorded as kept, struck, or pending against cited ledger facts. The public report view shows kept sentences; the internal report view also exposes struck and pending items. Print / PDF uses the browser print dialog.
 
-- **Baseline scan → follow-up scans.** Each site has a baseline photo. Every later visit is a follow-up captured *registered to that baseline*. At capture time the camera shows a translucent "ghost" of the baseline so the photographer lines up the same view. After upload, a registration step computes the geometric alignment and warps the follow-up onto the baseline. Before/after comparisons are then pixel-aligned, not two unrelated photos.
-- **A standardized response rubric.** Oncology grades tumour change with RANO/RECIST (complete response, partial response, stable, progression). SAAKSHYA grades site change with **Site Response Criteria (SRC)**, a per-project-type rubric (e.g. plantation: *established / partially established / no change / degraded*). Jev assigns the SRC grade from measured change metrics plus Cloudinary's visual descriptions, with calibrated probabilities. Low-confidence grades go to a human reviewer.
-- **Independent witnesses.** Every site has a QR plaque. Any passer-by, beneficiary or volunteer can scan it and submit a registered follow-up photo with no login. Jev triages the citizen submissions at volume. The site chart then shows whether the community's evidence **agrees or disagrees** with the implementer's latest claim.
-- **Reports with receipts.** An LLM drafts the donor report *only* from the evidence ledger. Jev then checks every sentence against the evidence it cites. Unsupported sentences are struck out before anyone sees the report. Each surviving sentence links to its source photo, the aligned derivative, the measurement and the Jev decision that backs it.
-- **Bulk intake that sorts itself.** Dropping a 500-photo WhatsApp export produces a live triage wall. Each photo is assigned to a site, timepoint and activity, flagged as duplicate/blurry/off-site, or routed for review, in seconds, for a cost shown on screen as the real measured number.
+Cloudinary AI captioning, automatic tagging, and OCR are not enabled on the account described by the checked-in capability probe. Caption and OCR fields are parsed only if returned; they are not a reliable input signal. Cloudinary does not compute registration or difference images. The Python/OpenCV worker performs those tasks.
 
-The user sees four surfaces: **Intake** (triage wall), **Site Chart** (timeline, aligned slider, timelapse, SRC grade history, witness agreement), **Witness Capture** (public QR page with ghost-overlay camera) and **Report** (receipt-linked donor report plus exports).
+Public video import accepts a permitted Cloudinary video URL and creates three still-frame evidence items. It does not analyze all frames, audio, or motion and does not splice or reframe video. C2PA signing, automatic video reels/timelapses, 500-photo import guarantees, and "zero local image processing" are not current capabilities.
 
-### Why this is the winning framing
+### Product direction
 
-- **It meets every PS2 goal with a real mechanism:** organize by project/location/timeline (site charts), identify activities and signals (Cloudinary perception + Jev), before/after (registration + SRC), reports and campaign content (receipt-checked report, timelapse reel), semantic search (Cloudinary search + Jev rerank), traceability (evidence ledger).
-- **Cloudinary does real work:** capture overlays, AI captioning and tagging, pHash, derived-asset lineage, aligned comparison rendering, timelapse video, face redaction and search. It's the system of record for pixels and their derivatives, not storage.
-- **It uses Jev where Jev is actually strong:** high-volume typed triage, rubric scoring with calibrated confidence, and sentence-level claim checking. The live Jev ecosystem (madewithjev.com, awesome-jev) is crowded with browser agents, games and evals. Almost nothing applies Jev to visual evidence or physical-world verification, so this is open ground.
-- **Founder fit:** longitudinal progression grading and image registration is the team lead's research (BraTS Lighthouse progression challenge, BrainGlobe atlas registration). The LLM-proposes / symbolic-layer-decides boundary comes from AtoM-Net. The citizen-witness idea comes from SAAKSHI. Judges reward a team that can explain *why* its method works.
+The product direction is site-based evidence over time: compare follow-up imagery to a baseline, accept independent witness evidence, and make report claims inspectable. Requirements that are not in the current implementation remain in the backlog below and should not be described as shipped.
 
 ---
 
-## User Stories
+## Product Requirements Backlog
+
+The following stories describe desired product behavior. Delivery status varies; they are not current capability claims unless independently confirmed in the "Current implementation" section and the code.
 
 ### Project setup
 1. As a program manager, I want to create a project with a type (plantation, cleanup, water point, sanitation, construction), so that the right Site Response Criteria are applied to its sites.
@@ -117,35 +113,35 @@ The user sees four surfaces: **Intake** (triage wall), **Site Chart** (timeline,
 
 ---
 
-## Implementation Decisions
+## Current Architecture and Implementation Notes
 
-### Division of labour (non-negotiable boundary)
-- **Cloudinary perceives and renders.** Upload, AI captioning and tagging, OCR where present, EXIF extraction, perceptual hash, face redaction, derived-asset storage, overlays, comparison rendering, timelapse video, search.
-- **Deterministic code measures.** Registration (feature matching + robust homography), registration quality, change metrics, GPS/radius checks, date checks, perceptual-hash distance. These are numbers, not opinions.
-- **Jev decides.** Every discrete judgement (site assignment, relevance, activity, SRC grade, witness agreement, sentence support, search rerank) is a Jev `Choice`, `Score` or `Noul` over a text/JSON state built from Cloudinary's descriptions plus the deterministic measurements. Jev's hosted model is text-only and does not see pixels (per TypeSafe's launch post and awesome-jev caveats), and the design depends on that.
-- **The generative LLM only drafts prose.** It never decides a grade, flag or verdict and cannot overrule Jev. Its output is untrusted until the sentence checker passes it.
+### Division of labour
+- **Cloudinary uploads and serves media.** The adapter signs browser uploads with `image_metadata`, `phash`, and `faces`; requests those fields plus tags and context on lookup; builds selected image transformation URLs; imports permitted public video assets and renders three still frames; and runs structured search expressions. Optional caption/OCR fields are parsed when returned. The checked-in probe shows those AI add-ons unavailable on the current account.
+- **The Python/OpenCV worker measures images.** It performs image registration, reports registration quality, and produces aligned/difference derivatives and change metrics. GPS/radius, date-window, and pHash integrity checks run in application code.
+- **Jev makes typed decisions.** The application supplies evidence and measurements for triage, grading, witness agreement, and report sentence support. The system records unavailable decisions as pending.
+- **The generative model drafts prose.** Draft sentences are checked against facts in the ledger. The model does not provide visual analysis or the deterministic image metrics.
 
 ### Modules
 
-1. **Media Gateway (Cloudinary adapter).** One interface over Cloudinary: signed direct-upload parameters, retrieval of the analysis results for an asset (caption, tags, OCR text, EXIF, pHash, faces), creation of derived assets with lineage context (source asset id, transform parameters, homography), URL builders for ghost overlay, aligned slider, difference overlay, social crops, face-redacted public delivery and site timelapse, and a search query builder. The rest of the system never builds Cloudinary URLs by hand.
-2. **Registration Service.** Input: baseline asset + follow-up asset. Output: homography matrix, inlier count/ratio, a quality grade (`good` / `weak` / `failed`), and the aligned derivative (uploaded through the Media Gateway). Runs as a small Python worker (OpenCV feature matching with robust estimation), called over HTTP. `failed` registration is itself evidence ("possibly different location").
-3. **Change Metrics.** Input: aligned pair. Output: per-project-type metrics, e.g. vegetation-cover fraction change (visible-band excess-green), changed-area fraction, mean brightness shift (to catch lighting-only change). Deterministic and pure. Lives with the Registration Service.
-4. **Decision Client (Jev adapter).** One interface: `decide(state, questions) → typed answers + probabilities + confidence + model version + latency`. Handles batching (many assets per request where questions share state shape), timeouts and retries. **No fabricated fallback.** If Jev is unreachable, decisions are recorded as `pending` and the UI says so. Pins the model version (currently `jev-1.13.x`) so decisions are reproducible. Keeps choice cardinality ≤255 by pre-filtering candidates (e.g. sites within GPS range) before asking.
-5. **Evidence Ledger.** The system of record for sites, timepoints, assets, derivatives, measurements, decisions, human overrides, claims and report sentences, with links between them. Append-only for decisions and overrides. Backed by Postgres (Supabase or Neon) so the demo survives restarts and multiple viewers.
-6. **Evidence Pipeline.** Orchestrates one asset from upload to ledger: fetch Cloudinary analysis → integrity checks (GPS radius, date window, pHash distance against the ledger) → Jev triage (site, relevance, activity) → registration + metrics if it belongs to a site with a baseline → recompute that site's timepoint SRC grade → recompute witness agreement. Exposes `ingest(assetId, source)` and `assessSite(siteId, timepoint)`.
-7. **Site Response Criteria.** Declarative rubric definitions per project type. Each has ordered levels with descriptions, the metrics that inform it, and thresholds for human review. Graded via Jev `Score`. Example (plantation): 0 degraded, 1 no change, 2 partially established, 3 established.
-8. **Witness Channel.** The public QR capture flow: rate-limited anonymous upload scoped to one site, ghost-overlay camera, optional comment, face redaction on all public delivery. Witness agreement for a site/period is a Jev `Choice` (`corroborates` / `contradicts` / `insufficient`) over the claim, implementer evidence summaries and witness evidence summaries.
-9. **Report Composer.** Builds a period report: the LLM drafts from a ledger digest where each fact carries an evidence id. The **Sentence Checker** splits the draft into sentences and asks Jev one `Noul` per sentence ("Is this sentence fully supported by the cited evidence?") against only the cited evidence. Sentences below threshold are struck, with the reason kept. Output: web page (public link) and PDF.
-10. **Search.** Cloudinary search for candidate retrieval (tags, metadata, date, folder), then Jev `Noul` relevance rerank against each candidate's text card (caption, tags, site, SRC grade, comment).
-11. **Calibration Harness.** Runs the Jev question set against a hand-labelled holdout of the team's own photos and reports accuracy, Brier score, expected calibration error and a reliability curve. Used to choose review thresholds and shown in the UI.
+1. **Media Gateway (Cloudinary adapter).** Signs uploads, reads available metadata and analysis fields, imports permitted public videos and extracts three stills, builds selected image delivery/composition URLs, and retrieves asset IDs through structured search expressions. The adapter does not call Cloudinary OCR/captioning add-ons, create difference images, or generate videos.
+2. **Registration Service.** A Python worker uses OpenCV to align a baseline/follow-up pair and returns registration quality, measurements, and aligned/difference derivatives. A failed registration can create a possible-different-location flag.
+3. **Change Metrics.** The Python worker returns the currently implemented vegetation-fraction, changed-area, and brightness-shift measurements for a registered pair.
+4. **Decision Client (Jev adapter).** Provides typed decisions and records model information and usage where returned. If Jev is unavailable, decision records are pending rather than fabricated.
+5. **Evidence Ledger.** Stores projects, sites, evidence, derivatives, measurements, decisions, claims, witness agreements, and report sentences in the configured database. Local development can use PGlite; hosted deployments use a PostgreSQL-compatible service.
+6. **Evidence Pipeline.** Ingests available media analysis, performs integrity checks, requests Jev triage, registers evidence against a baseline when applicable, stores derivatives/metrics, assesses sites, and updates witness agreement when evidence and an active claim permit it.
+7. **Site Response Criteria.** Rubrics define grades and review thresholds by project type. Jev grades a site using supplied measurements and registration information.
+8. **Witness Channel.** Public witness submissions are scoped to a site and pass through the evidence pipeline. When a claim and witness evidence are present, the application can ask Jev for an agreement decision; unavailable decisions remain pending. Public redaction depends on use of the relevant image URL helpers.
+9. **Report Composer.** Drafts from a ledger digest whose facts carry evidence IDs, then asks Jev to check eligible sentences against their cited facts. Unsupported or uncited sentences are struck; unavailable checks are pending. The public route shows kept sentences. Print / PDF is provided by the browser print dialog.
+10. **Search.** Cloudinary adapter search accepts structured expressions and returns candidate asset IDs. Application search and ranking are separate from Cloudinary; this adapter does not provide free-text semantic search.
+11. **Calibration Harness.** Any calibration display or threshold claim must be based on a documented labeled set and evaluation run. Do not imply production-grade calibration from a small development sample.
 
 ### Jev question set (decision contract)
 | Decision | Primitive | State given to Jev |
 |---|---|---|
-| Site assignment | `Choice` over ≤N nearby sites + `none` | caption, tags, OCR, GPS distance to each candidate, comment |
-| Relevance | `Choice`: `evidence` / `people_only` / `screenshot_or_meme` / `unusable_quality` | caption, tags, quality signals |
-| Activity | `Choice` over project-type activities | caption, tags, OCR |
-| SRC grade | `Score` over the project type's rubric levels | baseline + follow-up captions, change metrics, registration quality, days elapsed |
+| Site assignment | `Choice` over ≤N nearby sites + `none` | available caption/tags/text, GPS distance to each candidate, comment; caption and OCR may be absent |
+| Relevance | `Choice`: `evidence` / `people_only` / `screenshot_or_meme` / `unusable_quality` | available text and metadata, quality signals |
+| Activity | `Choice` over project-type activities | available text and metadata; caption/OCR are not guaranteed |
+| SRC grade | `Score` over the project type's rubric levels | available baseline/follow-up text, change metrics, registration quality, and days elapsed |
 | Witness agreement | `Choice`: `corroborates` / `contradicts` / `insufficient` | claim text, implementer and witness evidence summaries, their SRC grades |
 | Sentence support | `Noul` | one sentence + text of its cited evidence |
 | Search relevance | `Noul` | query + asset text card |
@@ -157,12 +153,12 @@ The user sees four surfaces: **Intake** (triage wall), **Site Chart** (timeline,
 - **Decision record:** subject id, decision kind, question, state hash, answer, probability distribution, confidence, model and version, latency, cost, timestamp, overridden-by.
 - **Report sentence:** text, cited evidence ids, support probability, status (`kept` / `struck`), reason.
 
-### Surfaces
-- **Intake:** drag-drop/ZIP/WhatsApp-export import and the live triage wall (cards animate into site lanes; the review lane is highlighted; real batch time and cost shown).
-- **Site Chart:** baseline, timeline of timepoints, aligned slider + difference overlay, SRC grade history with confidence, integrity flags, witness agreement badge, timelapse.
-- **Witness Capture:** public, mobile-first, bilingual, ghost overlay, offline retry.
-- **Report:** receipt-linked sentences, struck-sentence panel, exports, public page.
-- **Trust panel:** calibration metrics and decision-service status.
+### Application surfaces
+- **Intake and review:** image evidence intake, processing status, and review of evidence/flags. Do not imply ZIP/WhatsApp-export parsing or a tested 500-photo throughput unless demonstrated separately.
+- **Sites:** site list and site detail with evidence, baseline/follow-up comparison, registration information, and assessments where data exists.
+- **Witness:** public site-scoped evidence submission; witness agreement is computed only when a relevant claim and witness evidence exist and the decision service is available.
+- **Reports:** internal kept/struck/pending sentences, a public view of kept sentences, shareable route, and browser print / PDF.
+- **Search and trust:** application search can rerank text queries; the Cloudinary adapter itself only retrieves candidates by structured expression. Trust data is shown when a calibration result artifact is available.
 
 ### Design direction
 Remove the "command terminal" aesthetic and the projected-benchmark tickers. The visual language should be an evidence dossier / medical chart: light default with dark mode, strong typography, photos as the hero, and restrained colour reserved for SRC grades and flags. Every number shown must be measured, never projected.
@@ -193,44 +189,28 @@ Remove the "command terminal" aesthetic and the projected-benchmark tickers. The
 
 - Satellite or drone orthomosaic analysis (field phone photos only).
 - C2PA signing, blockchain anchoring and carbon-credit issuance/registry integration.
-- Native mobile apps (the capture flow is a mobile web page/PWA).
-- Training or fine-tuning custom vision models. Perception comes from Cloudinary; decisions come from Jev.
+- Native mobile apps.
+- Training or fine-tuning custom vision models. Current image registration and metrics use OpenCV; Cloudinary supplies media and available metadata.
 - Multi-tenant org management, SSO and fine-grained roles beyond `manager`, `reviewer` and public `witness`.
-- Voice-line intake (a natural SAAKSHI follow-up, listed for later).
+- Voice-line intake.
 - Pixel-level object counting (e.g. "exactly 312 saplings"). SRC grades are rubric-level on purpose.
 
 ---
 
 ## Further Notes
 
-### Real data is the product
-The demo must run on **real photos the team captures**, not stock images. Plan: from now to 2 Oct, pick 4–5 sites in Delhi where change is visible within days (an active construction/repair site, a garbage point before/after a cleanup drive the team joins or organizes, a new plantation, a lake or drain edge, a public toilet or water point). Capture a registered baseline and daily follow-ups with the ghost overlay, plus some unaligned casual shots. Deliberately plant the fraud cases:
-- one photo reused across two sites
-- one old photo presented as new
-- one photo from a different location
-- one stock image
+### Evidence and calibration status
+Evidence shown in a deployment may be live, seeded, or synthetic. Label it at the point of use and do not present seeded material as field capture. Do not claim a calibration holdout size, measured accuracy, or calibrated production performance unless the corresponding versioned evaluation artifact is available and its data source is clear.
 
-Hand-label ~150 photos as the calibration holdout.
+### Demo requirements
+Use the current [demo script](DEMO_SCRIPT.md) and judge entry page as the source of the reproducible sequence. The walkthrough must label service-dependent actions and any seeded evidence, and must not promise bulk throughput, Cloudinary AI add-ons, video reels, or other unimplemented capabilities.
 
-### Demo script (≈4 minutes)
-1. Drop a ~300-photo WhatsApp export. The triage wall sorts it live, and the measured time and cost appear.
-2. Open a Site Chart: aligned slider, SRC grade history with confidence, timelapse.
-3. Show the four planted frauds being caught, each with the exact check that fired.
-4. A judge scans the site QR on their own phone, sees the ghost overlay and submits a photo. Witness agreement updates.
-5. Generate the donor report. One overclaiming sentence gets struck live. Click a kept sentence and walk the chain back to the original upload.
-6. Trust panel: calibration numbers on the holdout.
-
-### Verify before building (unproven assumptions)
-- Which Cloudinary analysis add-ons (AI captioning, auto-tagging, OCR) are enabled on the team's plan and their quotas. Design so each missing signal degrades to "not available", never to invented text.
-- That the difference-blend overlay and multi-image timelapse/slideshow generation render as expected on the team's cloud. If not, compute the difference image in the Registration Service and upload it as a derivative.
-- Jev API access, current model version, rate limits and batching behaviour with the team's key.
-
-### Reuse from the current codebase
-Keep the Next.js app shell, signed direct upload, and the route-handler + Vitest structure. Replace the hardcoded demo fixtures, the mock-constant fallback in the Jev module, the FinOps ticker and the three-column terminal layout.
+### Account/service assumptions to recheck
+- The checked-in Cloudinary probe records AI captioning, Google/AWS auto-tagging, Cloudinary tagging, and advanced OCR as unavailable on the account at probe time. Recheck before describing any such add-on as enabled.
+- Jev availability, model/version, rate limits, and batching behavior depend on the configured service and should be reported from the running deployment.
 
 ### Sources consulted
 - TypeSafe AI, *Introducing System One Models & Jev*: https://typesafe.ai/blog/introducing-system-one-models-and-jev
 - Community project directory: https://madewithjev.com/
 - awesome-jev (155+ projects, caveats on text-only input and confidence): https://github.com/cobanov/awesome-jev
 - Cloudinary Agents launch (May 2026): https://www.businesswire.com/news/home/20260505410851/en/Cloudinary-Launches-AI-Agents-to-Streamline-Enterprise-Scale-Visual-Media-Management-and-Brand-Governance
-- Cloudinary hackathon 2026 submissions (to see what's crowded): https://hackindia.org/2026/pixels-to-products-cloudinary-ai-hackathon-2026

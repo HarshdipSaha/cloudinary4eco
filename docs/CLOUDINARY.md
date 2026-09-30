@@ -1,60 +1,34 @@
-# Cloudinary Architectural Implementation Guide: EcoProof AI
-**Hackathon Track:** Code Cubicle 6.0 — Problem Statement 02 (Cloudinary Track)  
-**Project:** EcoProof AI — Verifiable Impact & Sustainability Media Platform  
-**Purpose:** Asynchronous Judge Review & API Verification Reference  
+# SAAKSHYA Cloudinary integration
 
----
+This guide describes the Cloudinary adapter currently in `web/src/adapters/cloudinary/`. It is an implementation reference, not a roadmap. Cloudinary provides media upload, storage, selected metadata, URL transformations, and structured asset lookup. SAAKSHYA's Python/OpenCV worker performs image registration and change measurement.
 
-## 1. Executive Summary for Cloudinary Track Judges
+## Current integration
 
-EcoProof AI explicitly avoids the **"Dumb S3 Trap"** (using Cloudinary merely as static file storage). Instead, Cloudinary serves as the **core visual computation and transformation engine** for the entire platform. 
+| Capability | Implemented behavior | Boundary |
+|---|---|---|
+| Browser image upload | The server signs a direct upload with `image_metadata=true`, `phash=true`, and `faces=true`, plus the destination folder and optional context. The browser sends the exact signed parameters to Cloudinary. | The adapter does not request Cloudinary AI captioning, auto-tagging, or OCR add-ons. |
+| Asset analysis | Resource lookup requests image metadata, perceptual hash, face data, tags, and context. The adapter extracts available capture time/GPS, a valid 64-bit pHash, face count, tags, and optional caption/OCR fields if Cloudinary returns them. Missing signals remain missing. | A saved account probe records captioning, Google tagging, AWS Rekognition tagging, Cloudinary tagging, and advanced OCR as unavailable because the required subscriptions are inactive. Do not describe these as enabled features. |
+| Public image delivery | `publicPlate` and the side-by-side/social URL helpers apply Cloudinary's `e_pixelate_faces:20`, `f_auto`, and `q_auto` transformations. | These helpers only protect views that use them. Do not claim every public image or every route is automatically redacted. |
+| Image composition | The URL helpers can compose a before/after side-by-side image and square, portrait, or 4:5 social crops from image assets. | This is image compositing and cropping. It is not a video reel or video-splicing pipeline. |
+| Public video import | The adapter imports a permitted public Cloudinary video URL, reads its duration, and renders still images at three offsets (10%, 50%, and 90% of the duration). Those stills enter the normal evidence-ingest path. | This does not analyze the whole video, extract audio, create a timelapse, reframe video, or splice clips. Imported frame evidence has no trusted EXIF GPS or capture time. |
+| Structured media search | `searchIds` executes a Cloudinary search expression and returns matching public IDs. | This is structured candidate retrieval, not natural-language or semantic search. The media port explicitly supports filters only; SAAKSHYA's application search can apply its own ranking. |
+| Original and derived media | Cloudinary stores uploaded media and serves transformation URLs. | It does not perform SAAKSHYA's local registration or change measurement. The Python/OpenCV worker computes alignment, registration quality, metrics, aligned images, and difference images; those derivatives are associated with their source evidence in SAAKSHYA. |
 
-All heavy image diffing, aspect-ratio reframing, facial anonymization, OCR extraction, and video reel compilation are executed **dynamically on Cloudinary's global CDN edge via URL transformations and upload add-ons**, requiring zero server-side FFmpeg or graphics libraries.
+## Metadata and integrity limits
 
----
+The adapter reads GPS and capture time from metadata when present and parses a pHash for duplicate checks. It records missing values instead of inventing them. EXIF values can be absent or edited; they are useful signals, not cryptographic provenance or legal proof of where and when a photograph was taken. A pHash is a similarity signal, not proof that two images depict the same event.
 
-## 2. Cloudinary API & Transformation Matrix
+The `faces` upload parameter and public pixelation transform are separate behaviors: Cloudinary supplies face data to the adapter, while pixelation occurs only in URL helpers that request the transform. Review each public image surface before claiming it is anonymized.
 
-| Capability / Feature | Exact Cloudinary Parameter / API | Purpose in EcoProof AI | Live Demo Proof Point |
-| :--- | :--- | :--- | :--- |
-| **Direct Client Ingestion** | Upload Presets + Client Signing | Bypasses serverless 4.5MB request body limits; direct streaming from browser to edge | Upload high-res 4K drone captures with 0% server bandwidth |
-| **Sensor & EXIF Preservation** | `image_metadata: true` | Preserves hardware GPS, altitude, camera model, and capture timestamp | Legal proof of physical coordinate and time for carbon registries |
-| **Multi-Engine AI Tagging** | `categorization: "google_tagging,aws_rek_tagging"`, `auto_tagging: 0.70` | Automatically categorizes biomes, saplings, infrastructure, and tools | Ingestion webhook returns structured AI tags into TypeSafe Jev |
-| **High-Density Document OCR** | `ocr: "adv_ocr:document"` | Reads water borehole nameplates, Verra certificate signs, and solar pump serials | Extracted text strings cross-referenced against project registry IDs |
-| **Dynamic Split-View Comparison** | `c_fill,w_600,h_600/l_<after>/fl_layer_apply,g_east` | Assembles side-by-side before/after visual proof on-the-fly | Zero-latency dynamic comparison slider without local stitching |
-| **Real-Time Difference Heatmap** | `l_<after>/e_difference/fl_layer_apply` | Mathematically computes and highlights pixel deltas (canopy growth/trash clearance) | Visual evidence of biological growth and physical change in stark delta colors |
-| **AI Content-Aware Video Reframe** | `c_fill,ar_9:16,g_auto:subject` | Automatically centers field workers and saplings into vertical video format | Transforms horizontal 16:9 drone video into TikTok/Instagram Reels |
-| **Dynamic Video Splicing** | `fl_splice,l_video:<clip_2>` | Stitches baseline footage with current progress clips on Cloudinary edge | Zero-FFmpeg donor micro-documentary generation |
-| **Branded Subtitle & Text Overlays** | `l_subtitles:<vtt_id>`, `l_text:Arial_40_bold:VERIFIED` | Burns dynamic KPI metrics and narration directly into video stream | Permanent, tamper-resistant visual certification |
-| **Facial Anonymization (Ethical AI)**| `e_pixelate_faces:18` | Irreversibly blurs faces of indigenous community members and children | GDPR and human rights compliance for public donor viewing |
-| **Metadata Stripping for CDN** | `fl_strip_profile` | Removes sensitive GPS coordinates from public delivery edge | Prevents poachers from extracting endangered species locations |
-| **Eco-Conscious Media Delivery** | `f_auto,q_auto:eco` | Minimizes byte weight and data transfer carbon emissions | Slashing digital emissions by up to 78% across mobile networks |
-| **Content Credentials (C2PA)** | `fl_c2pa` | Injects cryptographically signed provenance manifests | Tamper-proof chain of editing custody for ESG auditors |
-| **Semantic & Metadata Search** | `cloudinary.v2.search.expression(...)` | Powers natural-language discovery across AI tags, OCR plaque text, and GPS | Instant search console fulfilling Problem Statement Requirement 5 |
+## Verified implementation references
 
----
+- Upload parameters, resource analysis, video import/frame rendering, and Cloudinary search: `web/src/adapters/cloudinary/gateway.ts`
+- Optional caption/OCR parsing, metadata, pHash, face count, and missing-signal tracking: `web/src/adapters/cloudinary/analysis.ts`
+- Image delivery, composition, face pixelation, and social crops: `web/src/adapters/cloudinary/urls.ts`
+- Evidence ingestion and Python registration port: `web/src/pipeline/ingest.ts` and `web/src/ports/registration.ts`
+- Public video frame extraction and normal evidence ingestion: `web/src/pipeline/public-video.ts`
+- Saved account capability probe: `web/src/test/fixtures/cloudinary/probe-report.json`
 
-## 3. URL Transformation Recipe Blueprints
+## Not currently supported by this adapter
 
-### Recipe 1: Side-by-Side Dual-Pane Before/After
-```text
-https://res.cloudinary.com/<cloud_name>/image/upload/c_fill,w_600,h_600/l_<after_id>/c_fill,w_600,h_600/fl_layer_apply,g_east,x_0/<before_id>.jpg
-```
-
-### Recipe 2: Pixel Difference Heatmap
-```text
-https://res.cloudinary.com/<cloud_name>/image/upload/c_fill,w_800,h_600/l_<after_id>/c_fill,w_800,h_600/e_difference/fl_layer_apply/<before_id>.jpg
-```
-
-### Recipe 3: Auto-Spliced 9:16 Vertical Video Reel with Captions & Branding
-```text
-https://res.cloudinary.com/<cloud_name>/video/upload/c_fill,ar_9:16,g_auto:subject,w_1080/l_video:<after_clip>/c_fill,ar_9:16,w_1080/fl_splice:transition_(name_fade;du_1.0)/fl_layer_apply/l_subtitles:captions_vtt/l_text:Arial_36_bold:VERIFIED%20IMPACT,g_north,y_40/f_auto,q_auto:eco/<before_clip>.mp4
-```
-
----
-
-## 4. Why This Architecture Deserves 1st Place
-
-1. **Pioneering Architecture**: First project to unite **Cloudinary's dynamic visual engine** with **TypeSafe Jev's System 1 non-autoregressive decision model**, cutting AI verification latency to **sub-100ms** and cost by **98.4%**.
-2. **Deepest API Utilization**: Uses **13 native Cloudinary features** spanning ingestion, AI vision, OCR, image transformations, video splicing, and C2PA provenance.
-3. **Zero Dumb Storage**: 100% of media manipulation happens dynamically on Cloudinary CDN URLs—zero local image processing libraries.
+Cloudinary OCR or AI caption/tagging add-ons, C2PA signing, Cloudinary pixel-difference analysis, whole-video understanding, video reframing or splicing, and automatic privacy guarantees across every public route are not implemented capabilities. The local OpenCV worker is part of the product's image-processing path; the claim "zero local image processing" would be inaccurate.

@@ -1,6 +1,6 @@
 # SAAKSHYA
 
-Verifiable impact tracking for NGOs, CSR teams and civic bodies.
+Verifiable impact tracking for NGOs, CSR teams, and civic bodies.
 
 **Live:** [saakshya-web.vercel.app](https://saakshya-web.vercel.app)
 
@@ -17,78 +17,49 @@ Verifiable impact tracking for NGOs, CSR teams and civic bodies.
 - [Cloudinary media intelligence research](docs/CLOUDINARY_MEDIA_INTELLIGENCE_RESEARCH.md)
 - [Literature recommendations](docs/LITERATURE_RECOMMENDATIONS.md)
 
----
-
 ## What It Solves
 
-Organizations running physical projects (plantations, lake cleanups, borewells, school toilets) collect thousands of photos a year through WhatsApp, phone galleries and Drive folders. Three things break every time:
-
-1. Before/after photos are taken from different spots and angles, so they prove nothing.
-2. All evidence comes from the party claiming success. No independent check.
-3. Donor reports are hand-written prose with no link to actual photos or measurements.
-
-SAAKSHYA fixes all three.
-
----
+Organizations running physical projects collect photos across sites and reporting periods. SAAKSHYA puts that evidence into a ledger so reviewers can compare site images, inspect integrity signals, accept independent witness submissions, and check report statements against cited evidence.
 
 ## How It Works
 
-Each site is treated like a patient in a longitudinal imaging study.
+**Upload and inspect.** Images are uploaded directly from the browser to Cloudinary using server-signed parameters. SAAKSHYA reads metadata and analysis fields that are available, and records missing signals as missing.
 
-**Baseline + registered follow-ups.** Every site has a baseline photo. When a field worker takes a follow-up, the camera shows a ghost overlay of the baseline so they line up the same view. After upload, a computer vision step aligns the follow-up to the baseline. Before/after comparisons are pixel-aligned, not two unrelated photos.
+**Register and measure.** The Python/OpenCV worker aligns follow-up images to a site's baseline and returns registration quality, change metrics, an aligned derivative, and a difference image. Jev makes typed decisions from the measurements and evidence supplied by SAAKSHYA; it does not inspect pixels.
 
-**Site Response Criteria (SRC) grading.** Site change is graded on a rubric (for example, a plantation gets: established / partially established / no change / degraded). A Jev typed-decision model assigns the grade from measured change metrics and Cloudinary's visual analysis. Low-confidence grades go to a human reviewer.
+**Review witness evidence.** A public site link accepts witness submissions without an account. Witness evidence enters the same evidence pipeline and can be reviewed alongside project evidence.
 
-**Independent citizen witnesses.** Each site gets a QR plaque. Any passer-by or volunteer scans it and submits a registered photo with no login. The site timeline shows whether community evidence agrees or disagrees with the implementer's claim.
-
-**Reports with receipts.** A language model drafts the donor report only from the evidence ledger. Every sentence is then checked against the evidence it cites. Unsupported sentences are struck out before publication. Each surviving sentence links to its source photo, the measured change and the Jev decision that backs it.
-
----
+**Check reports.** The report composer drafts from ledger facts and asks Jev to check each sentence against its cited facts. The internal view shows kept, struck, and pending sentences with reasons. The public report view shows kept sentences. Print / PDF opens the browser's print dialog.
 
 ## Cloudinary Integration
 
-Cloudinary is the core visual computation engine, not just storage.
+Cloudinary handles signed image uploads, media storage, selected metadata, URL transformations, and structured asset lookup. It does not do SAAKSHYA's registration or change measurement.
 
-| What it does | How |
+| What it does | Current implementation |
 |---|---|
-| Direct client upload | Upload presets + signed URLs, bypassing serverless body limits |
-| EXIF/GPS preservation | `image_metadata: true` for legal proof of coordinates and time |
-| AI tagging | `categorization: "google_tagging,aws_rek_tagging"` for biome and activity classification |
-| OCR on site nameplates | `ocr: "adv_ocr:document"` to read certificate and equipment serials |
-| Pixel difference heatmap | `e_difference` overlay to highlight canopy growth or trash clearance |
-| Before/after split view | Dynamic layer compositing, assembled on the CDN with no server code |
-| Face anonymization | `e_pixelate_faces:18` on every public image |
-| Vertical video reframe | `c_fill,ar_9:16,g_auto:subject` for donor social content |
-| C2PA provenance | `fl_c2pa` for cryptographically signed editing custody |
-| Semantic search | `cloudinary.v2.search` across AI tags, OCR text and GPS |
-| Eco delivery | `f_auto,q_auto:eco` to minimize data transfer emissions |
+| Signed direct image upload | Signs `image_metadata`, `phash`, and `faces`, plus the destination folder and optional context; the browser sends those exact parameters. |
+| Available asset metadata | Reads GPS, capture time, pHash, face count, tags, and any caption/OCR fields actually returned. Missing values are recorded as missing. |
+| Public image transforms | Selected image helpers apply face pixelation, automatic format, and quality transformations. Coverage depends on using those helpers. |
+| Image composition | URL helpers build before/after side-by-side images and social crops from image assets. |
+| Public video evidence | Imports a permitted public Cloudinary video URL and extracts three still frames for normal evidence ingestion. |
+| Structured search | Executes Cloudinary search expressions to retrieve asset IDs; the adapter supports filters, not free-text semantic search. |
 
----
+The saved account probe reports Cloudinary captioning, Google/AWS auto-tagging, Cloudinary AI tagging, and advanced OCR as unavailable for the current account. C2PA signing, Cloudinary difference analysis, video splicing/reframing, and "zero local image processing" are not current capabilities. See the [verified integration guide](docs/CLOUDINARY.md) for details and code references.
 
 ## Stack
 
 | Layer | Technology |
 |---|---|
 | Web app | Next.js 15 (App Router), TypeScript, React 19 |
-| Decisions | Jev by TypeSafe AI - every typed judgement goes through Jev |
-| Media | Cloudinary - perception, transformation, delivery, search |
+| Decisions | Jev by TypeSafe AI; unavailable decisions remain pending |
+| Media | Cloudinary for signed upload, available metadata, storage, transformations, and structured search |
 | CV worker | Python FastAPI + OpenCV for image registration and change metrics |
-| Database | Postgres (PGlite for local, Neon/Supabase for production) |
-| LLM | One generative model for drafting prose only, never for decisions |
+| Database | PostgreSQL-compatible ledger (PGlite locally; Neon or Supabase in production) |
+| Report drafting | Groq-backed language model for prose drafting; Jev checks sentences against ledger facts |
 
----
+## Current Product Flows
 
-## Four User-Facing Surfaces
-
-**Intake** - Drop a 500-photo WhatsApp export. Each photo is assigned to a site, timepoint and activity, or flagged as duplicate/blurry/off-site. Cost is shown as the real measured number.
-
-**Site Chart** - Timeline per site showing aligned before/after slider, timelapse, SRC grade history and whether citizen witnesses agree with the implementer.
-
-**Witness Capture** - Public QR page (no login). Shows ghost overlay of the baseline for alignment. Works one-handed on low-end Android over flaky networks.
-
-**Report** - Receipt-linked donor report. Every sentence links to its proof. Exports to PDF and a shareable public page.
-
----
+The app includes evidence intake and review, site evidence and registration views, public witness submission, evidence search, trust information, and report composition. External service availability affects which decisions can complete; unavailable decisions are recorded as pending rather than fabricated.
 
 ## Running Locally
 
@@ -101,25 +72,21 @@ npm run db:push
 npm run dev
 ```
 
-CV worker (optional for full registration):
+CV worker (needed for image registration and change metrics):
 
 ```bash
 cd cv
 pip install -e .
-uvicorn app:app --reload
+uvicorn app.main:app --reload
 ```
-
----
 
 ## Project Principles
 
-1. Measure, then decide, then write: numbers from deterministic code, judgements from Jev, prose last and checked.
-2. Every claim carries a receipt.
-3. Uncertainty is shown, never hidden. Low confidence routes to a human.
-4. The community is a witness, not an audience.
-5. Nothing on screen is projected or invented.
-
----
+1. Measure, then decide, then write: numbers come from deterministic code, judgements from Jev, and prose is checked against the evidence ledger.
+2. Claims should carry a receipt.
+3. Uncertainty is shown; unavailable work remains pending.
+4. Community members can submit independent evidence.
+5. Nothing on screen should be presented as measured unless it was measured.
 
 ## Naming
 
