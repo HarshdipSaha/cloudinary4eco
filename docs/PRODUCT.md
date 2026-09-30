@@ -4,55 +4,51 @@
 
 ## Platform
 
-web
+Web application with a separate Python CV worker.
+
+## Current implementation
+
+SAAKSHYA organizes evidence by project, site, and reporting period. It supports signed browser image uploads to Cloudinary, extraction of available metadata and integrity signals, evidence triage, Python/OpenCV image registration and change metrics, typed Jev decisions, public witness submissions, evidence search, and reports checked against ledger facts. The internal report view records kept, struck, and pending sentences; the public report view displays kept sentences. Browser print provides the PDF flow.
+
+Cloudinary AI captioning, automatic tagging, and OCR are unavailable on the account described by the checked-in probe. Cloudinary does not perform image registration or difference analysis. A permitted public Cloudinary video can be imported as three still-frame evidence items; full-video analysis and editing are not implemented.
 
 ## Stack
 
-Next.js 15 (App Router, TypeScript, React 19) for the app and API routes; a Python FastAPI + OpenCV worker for image registration and change metrics; Postgres (Neon or Supabase) for the evidence ledger; Cloudinary for media; Jev (TypeSafe AI) for typed decisions; one generative LLM for drafting prose only. Two deployables: web app and CV worker.
+Next.js 15 (App Router, TypeScript, React 19) for the web app and API routes; a Python FastAPI + OpenCV worker for image registration and change metrics; a PostgreSQL-compatible evidence ledger (PGlite locally, Neon or Supabase for hosted deployments); Cloudinary for media; Jev (TypeSafe AI) for typed decisions; and a Groq-backed language model for prose drafting. The web app and CV worker are separate deployables.
 
 ## Users
 
-Primary: the **program manager / auditor** at an NGO, CSR team or municipal body, working at a desk on a laptop. They sort months of field photos, check whether sites actually progressed, resolve flagged evidence and assemble the donor report. They are accountable for the claims and wary of being caught overclaiming.
+Primary: program managers and auditors at NGOs, CSR teams, or civic bodies who organize evidence, inspect site progress, review flags, and prepare reports.
 
-Secondary: field workers and citizens capturing registered follow-up photos on a phone at the site (short, outdoor, one-handed sessions); donors and the public reading a site's public page or the report.
+Secondary: field workers and citizens submitting site evidence from a phone, and donors or community members inspecting public site or report pages.
 
-## Product Purpose
+## Product direction
 
-SAAKSHYA turns an unsorted pile of field photos into longitudinal, verifiable evidence per site. Each site is tracked like a patient: a baseline, registered follow-ups, a graded response on a standard rubric, independent citizen witnesses, and reports where every sentence links to its proof. Success: a manager goes from a 500-photo WhatsApp dump to a receipt-linked donor report in minutes, and an auditor can trace any claim to the original upload.
+SAAKSHYA aims to make physical-project claims inspectable over time. A site can have a baseline and follow-up images, registered comparisons, an SRC grade, independent witness evidence, and report statements tied to ledger facts. These goals do not imply bulk WhatsApp import, offline capture, automated video generation, or every future workflow is currently available.
 
-## Positioning
+## Operating context
 
-Photos are aligned to the site baseline at capture time and after upload, so before/after comparisons are the same view. Site change is graded on explicit Site Response Criteria borrowed from longitudinal medical imaging. Every discrete judgement is a typed, calibrated Jev decision, and the generative LLM never decides. The community is an independent witness channel, not just the implementer.
+The application supports evidence intake and review, site evidence and registration views, public witness submissions, evidence search, trust information, and report composition. External services affect whether a decision completes. When Jev is unavailable, the application records the relevant decision as pending.
 
-## Operating Context
+## Capabilities and constraints
 
-Evidence arrives through WhatsApp exports, phone galleries, Drive folders and the site QR capture page. Work happens in review sessions before donor reporting deadlines. Outputs are a shareable report page, a PDF and a public site page reached from a QR plaque.
+- Cloudinary signs browser uploads with `image_metadata`, `phash`, and `faces` and returns available metadata and analysis fields. Missing signals remain missing.
+- The saved Cloudinary account probe records captioning, Google/AWS auto-tagging, Cloudinary tagging, and advanced OCR as unavailable. Optional response fields are not a dependable service capability.
+- The Python/OpenCV worker performs registration and returns quality, aligned/difference derivatives, and image change metrics. This is local image processing; "zero local image processing" is inaccurate.
+- Selected public image URL helpers apply face pixelation. Redaction depends on each public view using the appropriate helper; it is not an automatic guarantee across all routes.
+- Jev makes text-based decisions from evidence and measurements supplied by the application. It does not inspect image pixels.
+- A public video import yields three stills through the evidence pipeline. The application does not analyze the whole video or create video reels.
+- The report composer checks sentence facts with Jev. Public reports show kept sentences; internal review can show kept, struck, and pending sentences. Print / PDF uses the browser's print dialog.
+- Demo evidence and external-service state are deployment-specific. Label seeded or synthetic data and pending services clearly.
 
-## Capabilities and Constraints
+## Evidence and privacy commitments
 
-- Jev is text-only. Perception comes from Cloudinary analysis plus deterministic CV measurements.
-- Jev choice cardinality ≤255. Model version pinned.
-- No fabricated numbers anywhere: if a service is down, decisions show as pending.
-- Original uploads are never modified or deleted.
-- Faces are pixelated in every public view.
-- Terminology: Site, Baseline, Follow-up, Timepoint, Registration (quality: good/weak/failed), Site Response Criteria (SRC) grade, Witness, Witness agreement (corroborates/contradicts/insufficient), Evidence ledger, Decision record, Receipt.
+Do not present seeded or synthetic images as field evidence. Treat EXIF GPS and capture time as editable signals, not cryptographic proof. Apply the public face-pixelation helper wherever required and verify its use on each public route.
 
-## Brand Commitments
+## Product principles
 
-Name: **SAAKSHYA** (Sanskrit/Hindi: evidence, testimony).
-
-## Evidence on Hand
-
-None yet. Real field photos of 4–5 Delhi sites must be captured by the team. Stock images must not be presented as field evidence. Demonstration data in development must be labelled synthetic.
-
-## Product Principles
-
-1. Measure, then decide, then write: numbers from deterministic code, judgements from Jev, prose last and checked.
-2. Every claim carries a receipt.
-3. Uncertainty is shown, never hidden. Low confidence routes to a human.
-4. The community is a witness, not an audience.
-5. Nothing on screen is projected or invented.
-
-## Accessibility & Inclusion
-
-WCAG 2.2 AA. The capture page must work outdoors in bright light, one-handed, on low-end Android over flaky networks.
+1. Measure, then decide, then write: deterministic code supplies measurements, Jev makes typed decisions, and prose is checked against ledger facts.
+2. Make claims inspectable through their evidence receipts.
+3. Show uncertainty; leave unavailable decisions pending.
+4. Make a public path for community-submitted evidence.
+5. Label measurements and demo data according to their actual source.
