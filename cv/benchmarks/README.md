@@ -10,7 +10,7 @@ The registration step recognised the same scene under the tested lighting change
 
 - Most lighting and angle cases are synthetic perturbations of one demo photo, generated in memory. The recovered alignment is measured against the known transform, but the two images contain identical content, which is easier than a real re-shoot where plants have grown and light has changed. Only the four demo photos in `web/test-images/` are real images, and only three cases pair two different real photos of the same scene.
 - Two exploratory stress cases (severe underexposure, a 35° rotation) are reported but not gated. Both registered successfully, so this set has not found where registration breaks.
-- It says nothing about real-world planting outcomes, and it does not evaluate Jev. Jev's evaluation lives under `web/calibration` (added separately).
+- It says nothing about real-world planting outcomes, and it does not evaluate Jev. Jev's evaluation is in [`web/calibration`](../../web/calibration/README.md).
 
 ## Run it
 
