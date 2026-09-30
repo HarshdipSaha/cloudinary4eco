@@ -1,4 +1,5 @@
 // Keeps prose honest: every pinned number must match its source, and every path a document names must exist.
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,6 +7,11 @@ import { fileURLToPath } from "node:url";
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const read = (root, path) => readFileSync(join(root, path), "utf8");
+const json = (root, path) => JSON.parse(read(root, path));
+export const normalisedSha256 = (text) => createHash("sha256").update(text.replaceAll("\r\n", "\n")).digest("hex");
+
+const BENCH = "cv/benchmarks/photo-benchmark-results.json";
+const benchSummary = (root, category) => json(root, BENCH).summary[category];
 
 /** Claim key -> function(root) returning the true value as a string. */
 export const CLAIMS = {
@@ -14,10 +20,27 @@ export const CLAIMS = {
     if (!m) throw new Error("FRAME_RATIOS not found in web/src/pipeline/public-video.ts");
     return String(m[1].split(",").filter((s) => s.trim()).length);
   },
+  "benchmark.cases": (root) => String(json(root, BENCH).cases.length),
+  "benchmark.gated_met": (root) => {
+    const gated = json(root, BENCH).cases.filter((c) => c.gated);
+    return `${gated.filter((c) => c.expectation_met).length}/${gated.length}`;
+  },
+  "benchmark.lighting_cases": (root) => String(benchSummary(root, "lighting").cases),
+  "benchmark.angle_cases": (root) => String(benchSummary(root, "angle").cases),
+  "benchmark.unrelated_cases": (root) => String(benchSummary(root, "unrelated_site").cases),
+  "benchmark.angle_max_error_px": (root) => String(benchSummary(root, "angle").max_corner_error_px),
 };
 
-/** Checks that compare committed result artifacts with their inputs. Filled in by the accuracy work. */
-export const FINGERPRINTS = [];
+export function benchmarkFingerprint(root) {
+  if (!existsSync(join(root, BENCH))) return [`${BENCH} is missing`];
+  const expected = normalisedSha256(read(root, "cv/benchmarks/cases.json"));
+  return json(root, BENCH).manifest_sha256 === expected
+    ? []
+    : [`${BENCH} was generated from a different cases.json — regenerate the benchmark results`];
+}
+
+/** Checks that compare committed result artifacts with their inputs. */
+export const FINGERPRINTS = [benchmarkFingerprint];
 
 /** Gitignored files that docs legitimately tell readers to create; they never exist in a clean checkout. */
 const LOCAL_ONLY = new Set(["web/.env", "cv/.env"]);

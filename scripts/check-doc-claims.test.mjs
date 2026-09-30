@@ -67,3 +67,20 @@ test("checkRepo scans README, top-level docs, and cv/benchmarks/README.md", () =
   assert.equal(problems.length, 1);
   assert.match(problems[0], /docs\/X\.md/);
 });
+
+import { benchmarkFingerprint, normalisedSha256 } from "./check-doc-claims.mjs";
+
+test("benchmark fingerprint fails when results were produced from a different manifest", () => {
+  const root = repo({
+    "cv/benchmarks/cases.json": '{"cases":[]}\n',
+    "cv/benchmarks/photo-benchmark-results.json": JSON.stringify({ manifest_sha256: "stale", cases: [] }),
+  });
+  assert.match(benchmarkFingerprint(root)[0], /regenerate the benchmark results/);
+});
+
+test("benchmark fingerprint passes with matching hash regardless of line endings", () => {
+  const root = repo({ "cv/benchmarks/cases.json": '{\r\n"cases":[]\r\n}\r\n' });
+  writeFileSync(join(root, "cv/benchmarks/photo-benchmark-results.json"),
+    JSON.stringify({ manifest_sha256: normalisedSha256('{\n"cases":[]\n}\n'), cases: [] }));
+  assert.deepEqual(benchmarkFingerprint(root), []);
+});
