@@ -29,7 +29,38 @@ export const CLAIMS = {
   "benchmark.angle_cases": (root) => String(benchSummary(root, "angle").cases),
   "benchmark.unrelated_cases": (root) => String(benchSummary(root, "unrelated_site").cases),
   "benchmark.angle_max_error_px": (root) => String(benchSummary(root, "angle").max_corner_error_px),
+  "calibration.cases": (root) => String(caseLines(root).length),
+  "calibration.relevance_cases": (root) => String(caseLines(root).filter((c) => c.kind === "triage_relevance").length),
+  "calibration.site_cases": (root) => String(caseLines(root).filter((c) => c.kind === "triage_site").length),
+  "calibration.grade_cases": (root) => String(caseLines(root).filter((c) => c.kind === "src_grade").length),
+  "calibration.relevance_accuracy": (root) => calibrationPercent(root, "triage_relevance"),
+  "calibration.site_accuracy": (root) => calibrationPercent(root, "triage_site"),
+  "calibration.grade_accuracy": (root) => calibrationPercent(root, "src_grade"),
+  "calibration.relevance_test_n": (root) => String(json(root, CAL).kinds.triage_relevance.nTest),
+  "calibration.site_test_n": (root) => String(json(root, CAL).kinds.triage_site.nTest),
+  "calibration.grade_test_n": (root) => String(json(root, CAL).kinds.src_grade.nTest),
 };
+
+const CASES = "web/calibration/cases.jsonl";
+const CAL = "web/calibration/results.json";
+const caseLines = (root) =>
+  read(root, CASES)
+    .split(/\r?\n/)
+    .filter((l) => l.trim())
+    .map((l) => JSON.parse(l));
+const calibrationPercent = (root, kind) => `${(json(root, CAL).kinds[kind].test.accuracy * 100).toFixed(1)}%`;
+
+/** Committed Jev results must come from a live run on exactly the committed corpus. */
+export function calibrationFingerprint(root) {
+  if (!existsSync(join(root, CAL))) return [];
+  const results = json(root, CAL);
+  const problems = [];
+  if (results.source !== "live-jev") problems.push(`${CAL} must come from a live-jev run (source is "${results.source}")`);
+  if (results.casesSha256 !== normalisedSha256(read(root, CASES)) || results.n !== caseLines(root).length) {
+    problems.push(`${CAL} does not match ${CASES} — rerun npm run calibrate`);
+  }
+  return problems;
+}
 
 export function benchmarkFingerprint(root) {
   if (!existsSync(join(root, BENCH))) return [`${BENCH} is missing`];
@@ -40,7 +71,7 @@ export function benchmarkFingerprint(root) {
 }
 
 /** Checks that compare committed result artifacts with their inputs. */
-export const FINGERPRINTS = [benchmarkFingerprint];
+export const FINGERPRINTS = [benchmarkFingerprint, calibrationFingerprint];
 
 /** Gitignored files that docs legitimately tell readers to create; they never exist in a clean checkout. */
 const LOCAL_ONLY = new Set(["web/.env", "cv/.env"]);
