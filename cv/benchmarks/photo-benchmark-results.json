@@ -1,19 +1,80 @@
 {
-  "generated_at_utc": "2026-09-29T20:02:28.197234+00:00",
+  "generated_at_utc": "2026-09-30T17:22:39.348370+00:00",
   "python_version": "3.12.0",
   "opencv_version": "4.10.0",
   "numpy_version": "1.26.4",
+  "manifest_sha256": "07ec8d23a50c4c5feb0102fcc9d123b04727cd93836d79d2a0035b69b33f8394",
+  "summary": {
+    "angle": {
+      "cases": 11,
+      "gated": 10,
+      "met": 10,
+      "quality": {
+        "good": 11
+      },
+      "median_corner_error_px": 0.1,
+      "max_corner_error_px": 0.23
+    },
+    "lighting": {
+      "cases": 9,
+      "gated": 8,
+      "met": 8,
+      "quality": {
+        "good": 9
+      },
+      "median_corner_error_px": 0.01,
+      "max_corner_error_px": 0.23
+    },
+    "manipulated": {
+      "cases": 1,
+      "gated": 1,
+      "met": 1,
+      "quality": {
+        "failed": 1
+      },
+      "median_corner_error_px": null,
+      "max_corner_error_px": null
+    },
+    "same_scene": {
+      "cases": 1,
+      "gated": 1,
+      "met": 1,
+      "quality": {
+        "good": 1
+      },
+      "median_corner_error_px": null,
+      "max_corner_error_px": null
+    },
+    "unrelated_site": {
+      "cases": 6,
+      "gated": 6,
+      "met": 6,
+      "quality": {
+        "failed": 6
+      },
+      "median_corner_error_px": null,
+      "max_corner_error_px": null
+    }
+  },
   "cases": [
     {
       "name": "same_scene_baseline_followup",
+      "category": "same_scene",
+      "origin": "demo_photo",
       "baseline": "web/test-images/baseline.jpg",
       "followup": "web/test-images/followup.jpg",
-      "expected_quality": "good",
+      "perturb": [],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
       "quality": "good",
       "expectation_met": true,
+      "known_limitation": null,
       "inliers": 1764,
       "inlier_ratio": 0.9955,
-      "elapsed_ms": 812.7,
+      "corner_error_px": null,
+      "elapsed_ms": 820.4,
       "metrics": {
         "visible_green_cover_before_percent": 32.98,
         "visible_green_cover_after_percent": 47.77,
@@ -23,15 +84,789 @@
       }
     },
     {
-      "name": "unrelated_photo_negative_control",
+      "name": "lighting_darker_gamma_2_2",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 2.2
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 1672,
+      "inlier_ratio": 0.9952,
+      "corner_error_px": 0.02,
+      "elapsed_ms": 729.3,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 45.26,
+        "visible_green_cover_delta_percentage_points": 11.59,
+        "aligned_area_changed_percent": 11.65,
+        "brightness_shift_lab_l": -55.55
+      }
+    },
+    {
+      "name": "lighting_brighter_gamma_0_5",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 0.5
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 3019,
+      "inlier_ratio": 0.9987,
+      "corner_error_px": 0.01,
+      "elapsed_ms": 866.6,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 9.66,
+        "visible_green_cover_delta_percentage_points": -24.02,
+        "aligned_area_changed_percent": 12.34,
+        "brightness_shift_lab_l": 49.61
+      }
+    },
+    {
+      "name": "lighting_low_contrast_0_5",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "contrast",
+          "value": 0.5
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2785,
+      "inlier_ratio": 0.9996,
+      "corner_error_px": 0.01,
+      "elapsed_ms": 974.1,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 56.9,
+        "visible_green_cover_delta_percentage_points": 23.22,
+        "aligned_area_changed_percent": 37.39,
+        "brightness_shift_lab_l": 1.39
+      }
+    },
+    {
+      "name": "lighting_warm_cast",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "color_cast",
+          "bgr": [
+            0.8,
+            1.0,
+            1.25
+          ]
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 3735,
+      "inlier_ratio": 1.0,
+      "corner_error_px": 0.0,
+      "elapsed_ms": 870.4,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 31.68,
+        "visible_green_cover_delta_percentage_points": -1.99,
+        "aligned_area_changed_percent": 14.64,
+        "brightness_shift_lab_l": 4.83
+      }
+    },
+    {
+      "name": "lighting_hard_shadow_0_6",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "shadow",
+          "strength": 0.6
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2973,
+      "inlier_ratio": 1.0,
+      "corner_error_px": 0.01,
+      "elapsed_ms": 862.6,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 32.81,
+        "visible_green_cover_delta_percentage_points": -0.86,
+        "aligned_area_changed_percent": 15.58,
+        "brightness_shift_lab_l": -18.56
+      }
+    },
+    {
+      "name": "lighting_sensor_noise_12",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "noise",
+          "sigma": 12,
+          "seed": 11
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2800,
+      "inlier_ratio": 0.9979,
+      "corner_error_px": 0.02,
+      "elapsed_ms": 903.1,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 30.99,
+        "visible_green_cover_delta_percentage_points": -2.69,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": -0.05
+      }
+    },
+    {
+      "name": "lighting_whatsapp_jpeg_q20",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "jpeg",
+          "quality": 20
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2121,
+      "inlier_ratio": 0.9976,
+      "corner_error_px": 0.03,
+      "elapsed_ms": 900.8,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 29.04,
+        "visible_green_cover_delta_percentage_points": -4.63,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.06
+      }
+    },
+    {
+      "name": "lighting_dusk_gamma_4",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 4.0
+        },
+        {
+          "op": "noise",
+          "sigma": 8,
+          "seed": 5
+        }
+      ],
+      "expected_quality": null,
+      "gated": false,
+      "quality": "good",
+      "expectation_met": null,
+      "known_limitation": "Severe underexposure; records where registration degrades.",
+      "inliers": 266,
+      "inlier_ratio": 0.9466,
+      "corner_error_px": 0.23,
+      "elapsed_ms": 800.8,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 37.83,
+        "visible_green_cover_delta_percentage_points": 4.16,
+        "aligned_area_changed_percent": 73.63,
+        "brightness_shift_lab_l": -81.95
+      }
+    },
+    {
+      "name": "lighting_real_pair_darker",
+      "category": "lighting",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/followup.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 2.0
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 1451,
+      "inlier_ratio": 0.9925,
+      "corner_error_px": null,
+      "elapsed_ms": 905.9,
+      "metrics": {
+        "visible_green_cover_before_percent": 32.98,
+        "visible_green_cover_after_percent": 60.5,
+        "visible_green_cover_delta_percentage_points": 27.53,
+        "aligned_area_changed_percent": 19.22,
+        "brightness_shift_lab_l": -33.89
+      }
+    },
+    {
+      "name": "angle_rotate_5",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 5
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2411,
+      "inlier_ratio": 0.9983,
+      "corner_error_px": 0.04,
+      "elapsed_ms": 926.7,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.59,
+        "visible_green_cover_after_percent": 42.85,
+        "visible_green_cover_delta_percentage_points": 9.26,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.19
+      }
+    },
+    {
+      "name": "angle_rotate_10",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 10
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2444,
+      "inlier_ratio": 0.9971,
+      "corner_error_px": 0.07,
+      "elapsed_ms": 924.3,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.77,
+        "visible_green_cover_after_percent": 44.52,
+        "visible_green_cover_delta_percentage_points": 10.75,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.2
+      }
+    },
+    {
+      "name": "angle_rotate_20",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 20
+        }
+      ],
+      "expected_quality": [
+        "good",
+        "weak"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2305,
+      "inlier_ratio": 0.997,
+      "corner_error_px": 0.13,
+      "elapsed_ms": 985.4,
+      "metrics": {
+        "visible_green_cover_before_percent": 32.05,
+        "visible_green_cover_after_percent": 44.2,
+        "visible_green_cover_delta_percentage_points": 12.14,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.2
+      }
+    },
+    {
+      "name": "angle_step_back_0_8",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "scale",
+          "factor": 0.8
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 1577,
+      "inlier_ratio": 0.9962,
+      "corner_error_px": 0.1,
+      "elapsed_ms": 928.6,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 43.78,
+        "visible_green_cover_delta_percentage_points": 10.1,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.15
+      }
+    },
+    {
+      "name": "angle_step_in_1_25",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "scale",
+          "factor": 1.25
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 1785,
+      "inlier_ratio": 0.9955,
+      "corner_error_px": 0.08,
+      "elapsed_ms": 951.5,
+      "metrics": {
+        "visible_green_cover_before_percent": 32.31,
+        "visible_green_cover_after_percent": 45.1,
+        "visible_green_cover_delta_percentage_points": 12.8,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.23
+      }
+    },
+    {
+      "name": "angle_shifted_frame",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "translate",
+          "dx": 0.1,
+          "dy": -0.06
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2360,
+      "inlier_ratio": 0.9979,
+      "corner_error_px": 0.02,
+      "elapsed_ms": 933.4,
+      "metrics": {
+        "visible_green_cover_before_percent": 31.2,
+        "visible_green_cover_after_percent": 41.49,
+        "visible_green_cover_delta_percentage_points": 10.3,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.27
+      }
+    },
+    {
+      "name": "angle_tilt_0_08",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "perspective",
+          "tilt": 0.08
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 2361,
+      "inlier_ratio": 0.9983,
+      "corner_error_px": 0.09,
+      "elapsed_ms": 979.2,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 42.75,
+        "visible_green_cover_delta_percentage_points": 9.08,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.19
+      }
+    },
+    {
+      "name": "angle_tilt_0_2",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "perspective",
+          "tilt": 0.2
+        }
+      ],
+      "expected_quality": [
+        "good",
+        "weak"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 972,
+      "inlier_ratio": 0.9969,
+      "corner_error_px": 0.23,
+      "elapsed_ms": 973.0,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.67,
+        "visible_green_cover_after_percent": 43.92,
+        "visible_green_cover_delta_percentage_points": 10.24,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.19
+      }
+    },
+    {
+      "name": "angle_combined_reshoot",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 8
+        },
+        {
+          "op": "perspective",
+          "tilt": 0.1
+        },
+        {
+          "op": "gamma",
+          "value": 1.8
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 1484,
+      "inlier_ratio": 0.9953,
+      "corner_error_px": 0.13,
+      "elapsed_ms": 958.7,
+      "metrics": {
+        "visible_green_cover_before_percent": 33.13,
+        "visible_green_cover_after_percent": 47.06,
+        "visible_green_cover_delta_percentage_points": 13.93,
+        "aligned_area_changed_percent": 9.66,
+        "brightness_shift_lab_l": -45.52
+      }
+    },
+    {
+      "name": "angle_rotate_35",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 35
+        }
+      ],
+      "expected_quality": null,
+      "gated": false,
+      "quality": "good",
+      "expectation_met": null,
+      "known_limitation": "Far outside how a QR-plaque re-shoot is framed.",
+      "inliers": 2107,
+      "inlier_ratio": 0.9972,
+      "corner_error_px": 0.22,
+      "elapsed_ms": 928.4,
+      "metrics": {
+        "visible_green_cover_before_percent": 31.54,
+        "visible_green_cover_after_percent": 43.38,
+        "visible_green_cover_delta_percentage_points": 11.85,
+        "aligned_area_changed_percent": 0.0,
+        "brightness_shift_lab_l": 0.2
+      }
+    },
+    {
+      "name": "angle_real_pair_rotated",
+      "category": "angle",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/followup.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 10
+        }
+      ],
+      "expected_quality": [
+        "good"
+      ],
+      "gated": true,
+      "quality": "good",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 1497,
+      "inlier_ratio": 0.9967,
+      "corner_error_px": null,
+      "elapsed_ms": 1001.0,
+      "metrics": {
+        "visible_green_cover_before_percent": 32.95,
+        "visible_green_cover_after_percent": 50.51,
+        "visible_green_cover_delta_percentage_points": 17.56,
+        "aligned_area_changed_percent": 7.23,
+        "brightness_shift_lab_l": 5.27
+      }
+    },
+    {
+      "name": "unrelated_other_site",
+      "category": "unrelated_site",
+      "origin": "demo_photo",
       "baseline": "web/test-images/baseline.jpg",
       "followup": "web/test-images/other_site.jpg",
-      "expected_quality": "failed",
+      "perturb": [],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
       "quality": "failed",
       "expectation_met": true,
+      "known_limitation": null,
       "inliers": 4,
       "inlier_ratio": 0.3636,
-      "elapsed_ms": 754.2,
+      "corner_error_px": null,
+      "elapsed_ms": 922.9,
+      "metrics": null
+    },
+    {
+      "name": "unrelated_desert_witness",
+      "category": "unrelated_site",
+      "origin": "demo_photo",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/desert_witness.jpg",
+      "perturb": [],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
+      "quality": "failed",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 0,
+      "inlier_ratio": 0.0,
+      "corner_error_px": null,
+      "elapsed_ms": 740.0,
+      "metrics": null
+    },
+    {
+      "name": "unrelated_followup_vs_other",
+      "category": "unrelated_site",
+      "origin": "demo_photo",
+      "baseline": "web/test-images/followup.jpg",
+      "followup": "web/test-images/other_site.jpg",
+      "perturb": [],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
+      "quality": "failed",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 5,
+      "inlier_ratio": 0.3125,
+      "corner_error_px": null,
+      "elapsed_ms": 920.9,
+      "metrics": null
+    },
+    {
+      "name": "unrelated_other_vs_desert",
+      "category": "unrelated_site",
+      "origin": "demo_photo",
+      "baseline": "web/test-images/other_site.jpg",
+      "followup": "web/test-images/desert_witness.jpg",
+      "perturb": [],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
+      "quality": "failed",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 4,
+      "inlier_ratio": 0.4,
+      "corner_error_px": null,
+      "elapsed_ms": 741.9,
+      "metrics": null
+    },
+    {
+      "name": "unrelated_other_site_brightened",
+      "category": "unrelated_site",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/other_site.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 0.7
+        }
+      ],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
+      "quality": "failed",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 4,
+      "inlier_ratio": 0.3333,
+      "corner_error_px": null,
+      "elapsed_ms": 921.3,
+      "metrics": null
+    },
+    {
+      "name": "unrelated_synthetic_scenes",
+      "category": "unrelated_site",
+      "origin": "synthetic_perturbation",
+      "baseline": "synth:3",
+      "followup": "synth:4",
+      "perturb": [],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
+      "quality": "failed",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 8,
+      "inlier_ratio": 0.0816,
+      "corner_error_px": null,
+      "elapsed_ms": 523.4,
+      "metrics": null
+    },
+    {
+      "name": "manipulated_mirrored_copy",
+      "category": "manipulated",
+      "origin": "synthetic_perturbation",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "mirror"
+        }
+      ],
+      "expected_quality": [
+        "failed"
+      ],
+      "gated": true,
+      "quality": "failed",
+      "expectation_met": true,
+      "known_limitation": null,
+      "inliers": 6,
+      "inlier_ratio": 0.2,
+      "corner_error_px": null,
+      "elapsed_ms": 925.7,
       "metrics": null
     }
   ]
