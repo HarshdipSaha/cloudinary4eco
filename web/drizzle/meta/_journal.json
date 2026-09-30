@@ -15,6 +15,13 @@
       "when": 1790667777719,
       "tag": "0001_ordinary_hedge_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790787293296,
+      "tag": "0002_skinny_klaw",
+      "breakpoints": true
     }
   ]
 }

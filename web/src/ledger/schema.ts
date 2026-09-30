@@ -1,3 +1,4 @@
+import type { CampaignSentence } from "../domain/types";
 import { pgTable, text, integer, doublePrecision, jsonb, timestamp, serial, uniqueIndex, index } from "drizzle-orm/pg-core";
 
 export const projects = pgTable("projects", {
@@ -47,6 +48,16 @@ export const publicVideoImports = pgTable("public_video_imports", {
   statusReason: text("status_reason"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const videoCampaigns = pgTable("video_campaigns", {
+  id: text("id").primaryKey(),
+  importId: text("import_id").notNull().references(() => publicVideoImports.id),
+  frameAssetIds: jsonb("frame_asset_ids").$type<string[]>().notNull(),
+  imageUrl: text("image_url").notNull(),
+  facts: jsonb("facts").$type<{ id: string; text: string; evidenceIds: string[] }[]>().notNull(),
+  sentences: jsonb("sentences").$type<CampaignSentence[]>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index("video_campaigns_import").on(t.importId)]);
 
 export const evidence = pgTable("evidence", {
   assetId: text("asset_id").primaryKey(),

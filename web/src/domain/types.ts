@@ -91,3 +91,12 @@ export interface Decision<T = unknown> {
   latencyMs: number;
   inputTokens: number;
 }
+
+export interface CampaignSentence {
+  text: string;
+  factIds: string[];
+  status: "kept" | "struck" | "pending";
+  support: number | null;
+  decisionId: number | null;
+  reason: string | null;
+}

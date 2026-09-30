@@ -49,6 +49,13 @@ The optional `/w/plot-b?sample=seeded-followup` button re-uploads the follow-up 
 
 **Say:** “The report composer checks drafted sentences against ledger facts. This kept sentence has a receipt; the seeded sentence has none, so it is struck. When a check cannot run, the report marks it pending.”
 
+### 6. Play the video and build a campaign card — optional, live service results
+Use a video you are permitted to share (the Cloudinary demo video is fine for a rehearsal). In Search, choose **Analyse public video**, enter the URL, a site, and a permission note, then open **Open video rubric** when the stream completes.
+
+**Say:** "The video plays with the three sampled moments marked on its timeline. Clicking a moment, or its observation, jumps the video there, and the highlight follows playback. Each observation shows Jev's relevance decision with its probabilities and the review status. The video's date and location are not verified, and the page says so."
+
+In Review, accept one or more frames, then return and choose **Generate campaign card**. Jev sees text, not pixels, and a video frame has no caption or tags, so its relevance call on a frame is usually low-confidence and is shown as advisory; the reviewer's acceptance is what decides. The card uses only reviewer-accepted frames, with faces pixelated and a footer that states the date and location are unverified. Each caption sentence cites ledger facts and shows whether Jev kept or struck it. If Jev is unavailable the sentences read **pending**; do not present them as approved.
+
 ## Status labels and recovery
 
 - **Seeded** marks repository test media or the explicitly injected report control sentence.

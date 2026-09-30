@@ -22,6 +22,7 @@ export function PublicVideoDialog({
   const [permissionNote, setPermissionNote] = useState("");
   const [state, setState] = useState("ready");
   const [error, setError] = useState<string | null>(null);
+  const [importId, setImportId] = useState<string | null>(null);
 
   async function submit() {
     setError(null);
@@ -42,7 +43,8 @@ export function PublicVideoDialog({
         buffer += decoder.decode(next.value ?? new Uint8Array(), { stream: !next.done });
         for (const line of buffer.split("\n").slice(0, -1)) {
           if (!line.trim()) continue;
-          const event = JSON.parse(line) as { type: string; message?: string };
+          const event = JSON.parse(line) as { type: string; message?: string; importId?: string };
+          if (event.importId) setImportId(event.importId);
           if (event.type === "error" || event.type === "video_failed") throw new Error(event.message ?? "Video analysis failed.");
           if (event.type === "video_imported") setState("extracting frames");
           else if (event.type === "video_frame") setState("analysing");
@@ -84,9 +86,14 @@ export function PublicVideoDialog({
           <p className="text-[11px] leading-relaxed text-text-3">SAAKSHYA analyses three representative frames. A web URL does not prove the video’s capture time or GPS, so those signals remain marked missing.</p>
           {error && <p className="text-[11px] text-flag">{error}</p>}
           {state !== "ready" && <p className="font-mono text-[11px] text-measure">Status: {state}</p>}
+          {state === "complete" && importId && (
+            <a href={`/videos/${encodeURIComponent(importId)}`} className="block text-[12px] text-measure underline underline-offset-2">
+              Open video rubric
+            </a>
+          )}
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="quiet" onClick={onClose}>Cancel</Button>
-            <Button variant="primary" onClick={submit} disabled={!siteId || !sourceUrl.trim() || permissionNote.trim().length < 3 || ["validating", "importing", "extracting frames", "analysing"].includes(state)}>
+            <Button variant="primary" onClick={state === "complete" ? onClose : submit} disabled={!siteId || !sourceUrl.trim() || permissionNote.trim().length < 3 || ["validating", "importing", "extracting frames", "analysing"].includes(state)}>
               {state === "complete" ? "Done" : "Analyse frames"}
             </Button>
           </div>
