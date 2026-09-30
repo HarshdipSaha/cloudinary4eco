@@ -76,8 +76,36 @@ export async function updatePublicVideoImport(db: Db, id: string, values: { stat
   await db.update(t.publicVideoImports).set(values).where(eq(t.publicVideoImports.id, id));
 }
 
+export async function insertVideoCampaign(db: Db, row: typeof t.videoCampaigns.$inferInsert) {
+  await db.insert(t.videoCampaigns).values(row);
+}
+
+export async function latestVideoCampaign(db: Db, importId: string) {
+  return (
+    await db.select().from(t.videoCampaigns).where(eq(t.videoCampaigns.importId, importId))
+      .orderBy(desc(t.videoCampaigns.createdAt), desc(t.videoCampaigns.id)).limit(1)
+  )[0] ?? null;
+}
+
+/** Everything the video rubric page shows, in playback order. */
+export async function videoRubric(db: Db, importId: string) {
+  const imported = await publicVideoImport(db, importId);
+  if (!imported) return null;
+  const siteRow = await site(db, imported.siteId);
+  const frames = await publicVideoFrames(db, importId);
+  const observations = await Promise.all(
+    frames.map(async (frame) => {
+      const latest = new Map<string, Awaited<ReturnType<typeof decisionsFor>>[number]>();
+      for (const d of await decisionsFor(db, frame.assetId)) if (!latest.has(d.kind)) latest.set(d.kind, d);
+      return { frame, decisions: [...latest.values()].filter((d) => d.kind.startsWith("triage_")) };
+    })
+  );
+  return { import: imported, site: siteRow, observations, campaign: await latestVideoCampaign(db, importId) };
+}
+
 /** Deletes ledger rows for one import after its media resources have been cleaned up. */
 export async function deletePublicVideoImportRows(db: Db, importId: string) {
+  await db.delete(t.videoCampaigns).where(eq(t.videoCampaigns.importId, importId));
   const frames = await publicVideoFrames(db, importId);
   for (const frame of frames) await deleteEvidence(db, frame.assetId);
   await db.delete(t.publicVideoImports).where(eq(t.publicVideoImports.id, importId));
@@ -100,7 +128,8 @@ export async function decision(db: Db, id: number) {
   return (await db.select().from(t.decisions).where(eq(t.decisions.id, id)))[0] ?? null;
 }
 export async function decisionsFor(db: Db, subjectId: string) {
-  return db.select().from(t.decisions).where(eq(t.decisions.subjectId, subjectId)).orderBy(desc(t.decisions.createdAt));
+  return db.select().from(t.decisions).where(eq(t.decisions.subjectId, subjectId))
+    .orderBy(desc(t.decisions.createdAt), desc(t.decisions.id));
 }
 
 export type EvidenceInsert = typeof t.evidence.$inferInsert;
