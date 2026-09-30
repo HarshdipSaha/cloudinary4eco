@@ -43,7 +43,7 @@ Cloudinary handles signed image uploads, media storage, selected metadata, URL t
 | Available asset metadata | Reads GPS, capture time, pHash, face count, tags, and any caption/OCR fields actually returned. Missing values are recorded as missing. |
 | Public image transforms | Selected image helpers apply face pixelation, automatic format, and quality transformations. Coverage depends on using those helpers. |
 | Image composition | URL helpers build before/after side-by-side images and social crops from image assets. |
-| Public video evidence | Imports a permitted public Cloudinary video URL and extracts three still frames for normal evidence ingestion. |
+| Public video evidence | Imports a permitted public Cloudinary video URL and extracts <!-- claim:video.frames_per_import -->3<!-- /claim --> still frames for normal evidence ingestion. |
 | Structured search | Executes Cloudinary search expressions to retrieve asset IDs; the adapter supports filters, not free-text semantic search. |
 
 The checked-in account probe records Cloudinary captioning, Google/AWS auto-tagging, Cloudinary AI tagging, and advanced OCR as unavailable at probe time; recheck before describing these add-ons as enabled. C2PA signing, Cloudinary difference analysis, video splicing/reframing, and "zero local image processing" are not current capabilities. See the [verified integration guide](docs/CLOUDINARY.md) for details and code references.
