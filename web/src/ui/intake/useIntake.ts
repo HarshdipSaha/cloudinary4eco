@@ -38,7 +38,7 @@ export interface IntakeTotals {
   elapsedSec: number;
 }
 
-export function useIntake(projectId: string) {
+export function useIntake(projectId: string, siteId?: string) {
   const [rows, setRows] = useState<IntakeRow[]>([]);
   const [totals, setTotals] = useState<IntakeTotals>({
     processed: 0,
@@ -190,6 +190,7 @@ export function useIntake(projectId: string) {
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             projectId,
+            ...(siteId ? { siteId } : {}),
             assetIds: finishedAssetIds.map((x) => x.assetId),
             meta: metaObj,
           }),

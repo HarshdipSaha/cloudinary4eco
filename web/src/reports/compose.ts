@@ -10,14 +10,17 @@ const slug = customAlphabet("abcdefghijkmnpqrstuvwxyz23456789", 10);
 
 export async function composeReport(
   deps: PipelineDeps & { drafter: DrafterPort },
-  p: { projectId: string; periodStart: string; periodEnd: string }
+  p: { projectId: string; periodStart: string; periodEnd: string; includeSeededControl?: boolean }
 ) {
   const { db, decisions, drafter } = deps;
   const project = await repo.project(db, p.projectId);
   if (!project) throw new Error(`Unknown project ${p.projectId}`);
   const facts = await buildDigest(db, p.projectId, p.periodStart, p.periodEnd);
   const byId = new Map(facts.map((f) => [f.id, f]));
-  const draft = await drafter.draft({ projectName: project.name, periodStart: p.periodStart, periodEnd: p.periodEnd, facts });
+  const authoredDraft = await drafter.draft({ projectName: project.name, periodStart: p.periodStart, periodEnd: p.periodEnd, facts });
+  const draft = p.includeSeededControl
+    ? `${authoredDraft}\n\nFindings\nSeeded test control (intentionally unsupported): Exactly 999 saplings survived the monsoon in Plot B.`
+    : authoredDraft;
   const sentences = splitDraft(draft);
   const id = nanoid(12);
   await repo.insertReport(db, {

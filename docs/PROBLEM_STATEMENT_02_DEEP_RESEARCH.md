@@ -2,6 +2,8 @@
 **Hackathon:** Code Cubicle 6.0 | **Problem Statement:** 02 (Cloudinary Track)  
 **Date:** September 2026 | **Author:** Multi-Agent Research Swarm (13 Specialized Autonomous Subagents)
 
+> **Research proposal, not an implementation description.** The capabilities, architecture, and service integrations below are research material and are not claims about shipped SAAKSHYA features. See the [verified Cloudinary integration guide](CLOUDINARY.md), [current specification](SPECIFICATION_DOCUMENT.md), and [judge walkthrough](https://saakshya-web.vercel.app/judge) for the implementation and demo state.
+
 ---
 
 ## Executive Summary

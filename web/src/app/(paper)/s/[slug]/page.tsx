@@ -156,9 +156,9 @@ export default async function PublicSitePage(props: {
       {/* Visual Sequence Player (Pixelated Faces) */}
       <section className="my-10 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-serif text-2xl font-bold">Time-lapse verification</h2>
+          <h2 className="font-serif text-2xl font-bold">Site photo sequence</h2>
           <span className="font-mono text-[12px] text-paper-ink-muted">
-            All faces pixelated for privacy
+            Images in this sequence use the face-pixelation transform
           </span>
         </div>
         <SequencePlayer frames={frames} />
@@ -209,7 +209,7 @@ export default async function PublicSitePage(props: {
         <section className="my-10 rounded-[4px] border border-paper-line bg-paper-surface p-6 space-y-4">
           <h2 className="font-serif text-xl font-bold">Verifiable social assets</h2>
           <p className="text-[14px] text-paper-ink-muted">
-            Download side-by-side composite images with dates burned in, prepared for publication and audit reporting.
+            Download side-by-side composites from the baseline and latest available image. These are image crops, not video reels.
           </p>
           <div className="flex flex-wrap gap-3">
             {squareDownload && (

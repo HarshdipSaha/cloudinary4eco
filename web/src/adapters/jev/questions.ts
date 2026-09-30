@@ -26,7 +26,7 @@ export function triageQuestions(batch: TriageInput[]) {
         t.candidateSites.map((s) => [s.id, `${s.name}${s.description ? `: ${s.description}` : ""}${s.distanceM === null ? "" : ` (${Math.round(s.distanceM)} m from photo GPS)`}`]),
       );
       criteria.none = "None of these sites";
-      questions[`a${i}_site`] = choice(`Which registered project site does ${ref} show? Use the caption, OCR text, comment and GPS distance.`, criteria);
+      questions[`a${i}_site`] = choice(`Which registered project site does ${ref} show? Use any available caption or OCR text, the comment, and GPS distance; text fields may be missing.`, criteria);
     }
     questions[`a${i}_relevance`] = choice(`Is ${ref} usable field evidence for a ${t.projectType.replace("_", " ")} project?`, RELEVANCE_CRITERIA);
     questions[`a${i}_activity`] = choice(`What activity is visible in ${ref}?`, SRC[t.projectType].activities);

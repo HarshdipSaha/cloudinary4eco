@@ -11,6 +11,7 @@ import { Camera, RefreshCw, Send, CheckCircle2, ShieldCheck, Sliders } from "luc
 export function WitnessCapture({
   site,
   gradeLabel,
+  seededSampleUrl,
 }: {
   site: {
     id: string;
@@ -19,6 +20,7 @@ export function WitnessCapture({
     baselineAssetId: string | null;
   };
   gradeLabel?: string;
+  seededSampleUrl?: string;
 }) {
   const [phase, setPhase] = useState<"intro" | "camera" | "confirm" | "done" | "offline_saved">("intro");
   const [ghostOpacity, setGhostOpacity] = useState<number>(0.35);
@@ -31,6 +33,11 @@ export function WitnessCapture({
   const [comment, setComment] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [currentGrade, setCurrentGrade] = useState<string | null>(gradeLabel ?? null);
+  const [submittedRecord, setSubmittedRecord] = useState<{
+    assetId: string;
+    status: string;
+    statusReason: string | null;
+  } | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const ghostCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -157,6 +164,17 @@ export function WitnessCapture({
     setPhase("confirm");
   }
 
+  async function loadSeededSample() {
+    if (!seededSampleUrl) return;
+    const response = await fetch(seededSampleUrl);
+    if (!response.ok) return;
+    const blob = await response.blob();
+    setCapturedBlob(blob);
+    setPreviewUrl(URL.createObjectURL(blob));
+    setComment("Seeded walkthrough control: re-uploaded Plot B follow-up test image; not independent field testimony.");
+    setPhase("confirm");
+  }
+
   // Submit capture
   async function submitWitness() {
     if (!capturedBlob) return;
@@ -211,7 +229,12 @@ export function WitnessCapture({
 
         if (!witRes.ok) throw new Error("Witness ingest failed");
         const witData = await witRes.json();
-        if (witData.grade) setCurrentGrade(`Grade ${witData.grade}`);
+        if (witData.latestGrade) setCurrentGrade(`Grade ${witData.latestGrade}`);
+        setSubmittedRecord({
+          assetId: witData.assetId,
+          status: witData.status,
+          statusReason: witData.statusReason ?? null,
+        });
         setPhase("done");
         return;
       } catch (err) {
@@ -250,9 +273,22 @@ export function WitnessCapture({
           </p>
 
           <div className="rounded-[4px] border border-paper-line bg-paper-surface p-4 text-[13px] text-paper-ink-muted">
-            <span className="font-semibold text-paper-ink">Privacy guaranteed: </span>
-            Faces are blurred using Cloudinary privacy transforms before any photo is published.
+            Selected public image views use Cloudinary face pixelation. Redaction is not guaranteed on every route; avoid submitting sensitive images.
           </div>
+
+          {seededSampleUrl && (
+            <div className="rounded-[4px] border border-paper-line bg-paper-surface p-4 text-[13px] text-paper-ink-muted">
+              <span className="font-semibold text-paper-ink">Seeded test control: </span>
+              This reuses the Plot B follow-up fixture and can trigger a duplicate flag. It is not an independent field observation.
+              <button
+                type="button"
+                onClick={loadSeededSample}
+                className="mt-3 flex h-10 w-full items-center justify-center rounded-[4px] border border-paper-line bg-paper px-3 text-[12px] font-semibold text-paper-ink hover:bg-paper-surface"
+              >
+                Use seeded test image
+              </button>
+            </div>
+          )}
 
           {ghostUrl && (
             <div className="space-y-2">
@@ -302,7 +338,7 @@ export function WitnessCapture({
           </div>
 
           <div className="pb-6 space-y-3">
-            {/* Non-Negotiable Boundary: camera-only capture */}
+            {/* Request the device camera when the live viewfinder is unavailable. */}
             <input
               ref={fileInputRef}
               type="file"
@@ -473,8 +509,24 @@ export function WitnessCapture({
         <CheckCircle2 className="h-16 w-16 text-measure mb-4" />
         <h1 className="font-serif text-3xl font-bold tracking-tight mb-2">Received!</h1>
         <p className="max-w-xs text-[15px] text-paper-ink-muted mb-6">
-          Thank you for verifying this site. Your observation is now anchored to the ledger.
+          Thank you. Your submission has been received by the evidence pipeline.
         </p>
+
+        {submittedRecord && (
+          <div className="mb-6 w-full max-w-sm rounded-[4px] border border-paper-line bg-paper-surface p-4 text-left">
+            <div className="font-mono text-[11px] uppercase tracking-wider text-paper-ink-muted">Witness record</div>
+            <div className="mt-1 font-semibold text-paper-ink">{submittedRecord.status.replaceAll("_", " ")}</div>
+            {submittedRecord.statusReason && (
+              <p className="mt-1 text-[12px] text-paper-ink-muted">{submittedRecord.statusReason}</p>
+            )}
+            <Link
+              href={`/intake?siteId=${encodeURIComponent(site.id)}&assetId=${encodeURIComponent(submittedRecord.assetId)}`}
+              className="mt-3 inline-flex text-[12px] font-semibold text-paper-ink underline underline-offset-2"
+            >
+              Open this evidence record
+            </Link>
+          </div>
+        )}
 
         {currentGrade && (
           <div className="rounded-[4px] border border-paper-line bg-paper-surface px-4 py-2.5 mb-8">
@@ -499,7 +551,7 @@ export function WitnessCapture({
       <CheckCircle2 className="h-16 w-16 text-measure mb-4" />
       <h1 className="font-serif text-2xl font-bold tracking-tight mb-2">Saved on this phone</h1>
       <p className="max-w-xs text-[15px] text-paper-ink-muted mb-8">
-        It will send automatically when you&apos;re back online.
+        It will retry when you&apos;re back online. Until the upload finishes, it is pending and has no ledger record yet.
       </p>
 
       <Link

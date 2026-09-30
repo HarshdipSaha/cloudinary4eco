@@ -56,6 +56,12 @@ export default async function ConsoleHomePage() {
 
           <div className="flex items-center gap-2">
             <Link
+              href="/judge"
+              className="inline-flex h-9 items-center justify-center rounded-[2px] border border-line bg-surface-0 px-3 font-mono text-[12px] text-text hover:bg-surface-2 transition-colors"
+            >
+              Judge Walkthrough
+            </Link>
+            <Link
               href="/setup"
               className="inline-flex h-9 items-center justify-center rounded-[2px] border border-line bg-surface-0 px-3 font-mono text-[12px] text-text hover:bg-surface-2 transition-colors"
             >

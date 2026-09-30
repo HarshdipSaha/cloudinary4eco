@@ -264,7 +264,7 @@ export function Drawer({
             {/* 2. Cloudinary Analysis */}
             <div className="space-y-2 rounded-[2px] border border-line bg-surface-0 p-3 text-[12px]">
               <div className="mono text-[11px] font-semibold tracking-wider text-text-3 uppercase">
-                Cloudinary Perception
+                Cloudinary asset fields
               </div>
               <div className="space-y-1.5">
                 <div>
@@ -272,7 +272,7 @@ export function Drawer({
                   <span className="text-text">
                     {ev?.caption ?? (
                       <span className="text-text-3 italic">
-                        No caption: captioning add-on not available
+                        No caption was returned; captioning is unavailable on this account.
                       </span>
                     )}
                   </span>
@@ -341,7 +341,7 @@ export function Drawer({
             {/* 3. Jev Decisions */}
             <div className="space-y-3">
               <div className="mono text-[11px] font-semibold tracking-wider text-text-3 uppercase">
-                Calibrated Decisions (Jev)
+                Decision records (Jev)
               </div>
               {detail?.decisions && detail.decisions.length > 0 ? (
                 detail.decisions.map((d) => (
@@ -377,7 +377,7 @@ export function Drawer({
                   {row.relevance ? (
                     <span>Relevance: {row.relevance}</span>
                   ) : (
-                    "No calibrated decisions recorded."
+                    "No Jev decision records for this item."
                   )}
                 </div>
               )}

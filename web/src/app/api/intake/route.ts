@@ -5,9 +5,11 @@ import { z } from "zod";
 import { nanoid } from "nanoid";
 import { deps } from "@/adapters/container";
 import { ingestBatch } from "@/pipeline/ingest";
+import * as repo from "@/ledger/repo";
 
 const Body = z.object({
   projectId: z.string(),
+  siteId: z.string().optional(),
   assetIds: z.array(z.string()).min(1).max(600),
   meta: z
     .record(
@@ -23,6 +25,13 @@ const Body = z.object({
 
 export async function POST(req: Request) {
   const body = Body.parse(await req.json());
+  const d = await deps();
+  if (body.siteId) {
+    const site = await repo.site(d.db, body.siteId);
+    if (!site || site.projectId !== body.projectId) {
+      return Response.json({ error: "The selected site does not belong to this project." }, { status: 400 });
+    }
+  }
   const batchId = nanoid(10);
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -30,7 +39,7 @@ export async function POST(req: Request) {
       const send = (o: unknown) => controller.enqueue(encoder.encode(`${JSON.stringify(o)}\n`));
       send({ type: "batch", batchId, total: body.assetIds.length });
       try {
-        await ingestBatch(await deps(), { projectId: body.projectId, source: "bulk_import", assetIds: body.assetIds, batchId, meta: body.meta }, send);
+        await ingestBatch(d, { projectId: body.projectId, siteId: body.siteId, source: "bulk_import", assetIds: body.assetIds, batchId, meta: body.meta }, send);
       } catch (e) {
         send({ type: "error", message: (e as Error).message });
       } finally {

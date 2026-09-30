@@ -59,8 +59,9 @@ export function GradeStrip({
     );
   }
 
-  const probs = decision?.probabilities ?? { [String(grade)]: 1.0 };
-  const topProb = probs[String(grade)] ?? decision?.confidence ?? 1.0;
+  const probs = decision?.probabilities;
+  const topProb = probs?.[String(grade)] ?? null;
+  const confidence = decision?.confidence ?? null;
 
   return (
     <div className="flex flex-col border-t border-line bg-surface-1">
@@ -69,22 +70,33 @@ export function GradeStrip({
           <div className="flex items-center gap-3">
             <GradeGlyph type={projectType} grade={grade} size="lg" />
             <StatusMark status={status as any} />
-            <span className="mono text-[12px] text-text-3">
-              model p {Math.round(topProb * 100)}%
-            </span>
+            {topProb !== null ? (
+              <span className="mono text-[12px] text-text-3">
+                model p {Math.round(topProb * 100)}%
+              </span>
+            ) : confidence !== null ? (
+              <span className="mono text-[12px] text-text-3">
+                Jev confidence {Math.round(confidence * 100)}%
+              </span>
+            ) : (
+              <span className="mono text-[12px] text-text-3">Decision probability unavailable</span>
+            )}
           </div>
 
-          <ProbabilityBar
-            probabilities={probs}
-            chosen={String(grade)}
-            labels={labels}
-          />
+          {probs && Object.keys(probs).length > 0 && (
+            <ProbabilityBar
+              probabilities={probs}
+              chosen={String(grade)}
+              labels={labels}
+            />
+          )}
         </div>
 
         <div className="flex flex-col items-end gap-2">
           <div className="mono text-[11px] text-text-3">
-            Jev {decision?.model ?? "jev-1.13.0"} · {decision?.latencyMs ?? 94} ms ·{" "}
-            {decision?.inputTokens ?? 120} tok
+            {decision
+              ? `Jev ${decision.model ?? "model unavailable"} · ${decision.latencyMs ?? "—"} ms · ${decision.inputTokens ?? "—"} tok`
+              : "Jev decision record unavailable"}
           </div>
 
           <div className="flex items-center gap-2">
