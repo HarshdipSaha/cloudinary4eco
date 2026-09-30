@@ -17,7 +17,8 @@
     "proof:production": "tsx scripts/production-evidence-proof.ts",
     "probe:jev": "tsx scripts/probe-jev.ts",
     "seed": "tsx scripts/seed.ts",
-    "calibrate": "tsx scripts/calibrate.ts"
+    "calibrate": "tsx scripts/calibrate.ts",
+    "calibration:export": "tsx scripts/export-ledger-cases.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
