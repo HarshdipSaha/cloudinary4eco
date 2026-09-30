@@ -67,3 +67,44 @@ test("checkRepo scans README, top-level docs, and cv/benchmarks/README.md", () =
   assert.equal(problems.length, 1);
   assert.match(problems[0], /docs\/X\.md/);
 });
+
+import { benchmarkFingerprint, normalisedSha256 } from "./check-doc-claims.mjs";
+
+test("benchmark fingerprint fails when results were produced from a different manifest", () => {
+  const root = repo({
+    "cv/benchmarks/cases.json": '{"cases":[]}\n',
+    "cv/benchmarks/photo-benchmark-results.json": JSON.stringify({ manifest_sha256: "stale", cases: [] }),
+  });
+  assert.match(benchmarkFingerprint(root)[0], /regenerate the benchmark results/);
+});
+
+test("benchmark fingerprint passes with matching hash regardless of line endings", () => {
+  const root = repo({ "cv/benchmarks/cases.json": '{\r\n"cases":[]\r\n}\r\n' });
+  writeFileSync(join(root, "cv/benchmarks/photo-benchmark-results.json"),
+    JSON.stringify({ manifest_sha256: normalisedSha256('{\n"cases":[]\n}\n'), cases: [] }));
+  assert.deepEqual(benchmarkFingerprint(root), []);
+});
+
+import { calibrationFingerprint } from "./check-doc-claims.mjs";
+
+test("calibration fingerprint passes when no results are committed", () => {
+  const root = repo({ "web/calibration/cases.jsonl": "{}\n" });
+  assert.deepEqual(calibrationFingerprint(root), []);
+});
+
+test("calibration fingerprint fails for results from another corpus or a non-live source", () => {
+  const root = repo({
+    "web/calibration/cases.jsonl": "{}\n",
+    "web/calibration/results.json": JSON.stringify({ source: "hand", casesSha256: "x", n: 1 }),
+  });
+  const problems = calibrationFingerprint(root);
+  assert.ok(problems.some((p) => /live-jev/.test(p)));
+  assert.ok(problems.some((p) => /rerun npm run calibrate/.test(p)));
+});
+
+test("calibration fingerprint passes for live results that match the corpus", () => {
+  const cases = '{"id":"a"}\n';
+  const root = repo({ "web/calibration/cases.jsonl": cases });
+  writeFileSync(join(root, "web/calibration/results.json"), JSON.stringify({ source: "live-jev", casesSha256: normalisedSha256(cases), n: 1 }));
+  assert.deepEqual(calibrationFingerprint(root), []);
+});

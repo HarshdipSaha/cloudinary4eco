@@ -1,2 +1,5 @@
 .vercel
 .env*
+
+# unlabelled working file for calibration export
+calibration/ledger-candidates.jsonl
