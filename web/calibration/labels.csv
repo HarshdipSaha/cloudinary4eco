@@ -1,9 +1,0 @@
-asset_id,site_id,relevance,activity,site_timepoint,src_grade
-saakshya/yamuna-green/bulk_import/p1_baseline,plot-b,evidence,planting,,
-saakshya/yamuna-green/bulk_import/p1_followup_day30,plot-b,evidence,monitoring,,
-saakshya/yamuna-green/bulk_import/p1_followup_day60,plot-b,evidence,monitoring,,
-saakshya/yamuna-green/bulk_import/p1_followup_day90,plot-b,evidence,monitoring,,
-saakshya/yamuna-green/bulk_import/p1_screenshot,none,screenshot_or_meme,other,,
-saakshya/yamuna-green/bulk_import/p1_offsite,none,unrelated,other,,
-,,,,plot-b@2026-09-30,2
-,,,,plot-b@2026-10-30,3
