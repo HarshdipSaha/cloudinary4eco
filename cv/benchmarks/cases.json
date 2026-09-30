@@ -1,0 +1,408 @@
+{
+  "version": 1,
+  "notes": "Expectations are set from design intent before running. Synthetic perturbations test robustness; they are not field photos.",
+  "cases": [
+    {
+      "name": "same_scene_baseline_followup",
+      "category": "same_scene",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/followup.jpg",
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_darker_gamma_2_2",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 2.2
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_brighter_gamma_0_5",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 0.5
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_low_contrast_0_5",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "contrast",
+          "value": 0.5
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_warm_cast",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "color_cast",
+          "bgr": [
+            0.8,
+            1.0,
+            1.25
+          ]
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_hard_shadow_0_6",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "shadow",
+          "strength": 0.6
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_sensor_noise_12",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "noise",
+          "sigma": 12,
+          "seed": 11
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_whatsapp_jpeg_q20",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "jpeg",
+          "quality": 20
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "lighting_dusk_gamma_4",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 4.0
+        },
+        {
+          "op": "noise",
+          "sigma": 8,
+          "seed": 5
+        }
+      ],
+      "expect": null,
+      "exploratory": "Severe underexposure; records where registration degrades."
+    },
+    {
+      "name": "lighting_real_pair_darker",
+      "category": "lighting",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/followup.jpg",
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 2.0
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_rotate_5",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 5
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_rotate_10",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 10
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_rotate_20",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 20
+        }
+      ],
+      "expect": [
+        "good",
+        "weak"
+      ]
+    },
+    {
+      "name": "angle_step_back_0_8",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "scale",
+          "factor": 0.8
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_step_in_1_25",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "scale",
+          "factor": 1.25
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_shifted_frame",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "translate",
+          "dx": 0.1,
+          "dy": -0.06
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_tilt_0_08",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "perspective",
+          "tilt": 0.08
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_tilt_0_2",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "perspective",
+          "tilt": 0.2
+        }
+      ],
+      "expect": [
+        "good",
+        "weak"
+      ]
+    },
+    {
+      "name": "angle_combined_reshoot",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 8
+        },
+        {
+          "op": "perspective",
+          "tilt": 0.1
+        },
+        {
+          "op": "gamma",
+          "value": 1.8
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "angle_rotate_35",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 35
+        }
+      ],
+      "expect": null,
+      "exploratory": "Far outside how a QR-plaque re-shoot is framed."
+    },
+    {
+      "name": "angle_real_pair_rotated",
+      "category": "angle",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/followup.jpg",
+      "perturb": [
+        {
+          "op": "rotate",
+          "degrees": 10
+        }
+      ],
+      "expect": [
+        "good"
+      ]
+    },
+    {
+      "name": "unrelated_other_site",
+      "category": "unrelated_site",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/other_site.jpg",
+      "expect": [
+        "failed"
+      ]
+    },
+    {
+      "name": "unrelated_desert_witness",
+      "category": "unrelated_site",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/desert_witness.jpg",
+      "expect": [
+        "failed"
+      ]
+    },
+    {
+      "name": "unrelated_followup_vs_other",
+      "category": "unrelated_site",
+      "baseline": "web/test-images/followup.jpg",
+      "followup": "web/test-images/other_site.jpg",
+      "expect": [
+        "failed"
+      ]
+    },
+    {
+      "name": "unrelated_other_vs_desert",
+      "category": "unrelated_site",
+      "baseline": "web/test-images/other_site.jpg",
+      "followup": "web/test-images/desert_witness.jpg",
+      "expect": [
+        "failed"
+      ]
+    },
+    {
+      "name": "unrelated_other_site_brightened",
+      "category": "unrelated_site",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/other_site.jpg",
+      "expect": [
+        "failed"
+      ],
+      "perturb": [
+        {
+          "op": "gamma",
+          "value": 0.7
+        }
+      ]
+    },
+    {
+      "name": "unrelated_synthetic_scenes",
+      "category": "unrelated_site",
+      "baseline": "synth:3",
+      "followup": "synth:4",
+      "expect": [
+        "failed"
+      ]
+    },
+    {
+      "name": "manipulated_mirrored_copy",
+      "category": "manipulated",
+      "baseline": "web/test-images/baseline.jpg",
+      "followup": "web/test-images/baseline.jpg",
+      "perturb": [
+        {
+          "op": "mirror"
+        }
+      ],
+      "expect": [
+        "failed"
+      ]
+    }
+  ]
+}
