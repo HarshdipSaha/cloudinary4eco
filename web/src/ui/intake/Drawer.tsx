@@ -330,6 +330,12 @@ export function Drawer({
                 <div className="mono text-[11px] text-text-3">
                   Frame {ev?.frameSecond ?? 0}s · capture time and GPS unavailable unless separately verified.
                 </div>
+                <a
+                  href={`/videos/${encodeURIComponent(detail.publicVideoImport.id)}`}
+                  className="mono inline-block text-[11px] text-measure underline underline-offset-2"
+                >
+                  Open video rubric
+                </a>
                 <div className="text-[11px] text-text-3">Delete the entire import to remove this shared video and its frames.</div>
                 <Button variant="quiet" onClick={handleDeletePublicVideoImport} disabled={submitting} className="gap-1.5 text-flag hover:border-flag/60">
                   <Trash2 className="h-3.5 w-3.5" />

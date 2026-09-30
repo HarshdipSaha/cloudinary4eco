@@ -353,8 +353,8 @@ export function SearchClient({
           projectId={projectId}
           sites={sites}
           onClose={() => setVideoDialogOpen(false)}
+          // Stay open after completion so the reviewer can follow the link to the video rubric.
           onComplete={() => {
-            setVideoDialogOpen(false);
             performSearch();
           }}
         />
