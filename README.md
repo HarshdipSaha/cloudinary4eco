@@ -2,9 +2,11 @@
 
 Verifiable impact tracking for NGOs, CSR teams, and civic bodies.
 
+**Status:** WINNNER OF THE HACKATHON🌟
+
 **Live:** [saakshya-web.vercel.app](https://saakshya-web.vercel.app)
 
-**Judge walkthrough:** [Open the upload-first evidence journey](https://saakshya-web.vercel.app/judge) 
+**Demo:** [Loom](https://www.loom.com/share/0dcab5f8f0b84e7c94952ccabbc167ec)
 
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/07b68a33-2e87-4e0c-8c41-607d4385dbff" />
 
